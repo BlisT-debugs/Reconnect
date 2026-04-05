@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------
+// CORE MULTI-TENANCY SYSTEM
+// ------------------------------------------------------
+// ------------------------------------------------------
+// CORE MULTI-TENANCY SYSTEM
+// ------------------------------------------------------
+model Tenant {
+  id        String   @id // e.g., 'admin', 'college_a'
+  name      String?
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships (A tenant has many domains, users, alumni, and academic data)
+  domains      Domain[]
+  users        User[]
+  alumni       Alumnus[]
+  
+  // <-- The 3 missing lines Prisma was asking for! -->
+  batches      Batch[]
+  departments  Department[]
+  passingYears PassingYear[]
+}
+
+model Domain {
+  id        Int      @id @default(autoincrement())
+  domain    String   @unique // e.g., '127.0.0.1' or 'alumni.test'
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ------------------------------------------------------
+// USER AUTHENTICATION & PROFILES
+// ------------------------------------------------------
+model User {
+  id                Int       @id @default(autoincrement())
+  tenantId          String
+  name              String
+  email             String    @unique
+  password          String
+  role              String    @default("Alumni") // 'Super Admin', 'Admin', 'Alumni'
+  email_verified_at DateTime?
+  status            Int       @default(1)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumnusProfile    Alumnus?  // One-to-One relationship
+}
+
+// ------------------------------------------------------
+// ACADEMIC DATA 
+// ------------------------------------------------------
+model Batch {
+  id        Int       @id @default(autoincrement())
+  tenantId  String
+  name      String
+  status    Int       @default(1)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni    Alumnus[]
+}
+
+model Department {
+  id         Int       @id @default(autoincrement())
+  tenantId   String
+  name       String
+  short_name String?
+  status     Int       @default(1)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni     Alumnus[]
+}
+
+model PassingYear {
+  id        Int       @id @default(autoincrement())
+  tenantId  String
+  name      String
+  status    Int       @default(1)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni    Alumnus[]
+}
+
+// ------------------------------------------------------
+// EXACT XAMPP ALUMNUS PROFILE 
+// ------------------------------------------------------
+model Alumnus {
+  id              Int       @id @default(autoincrement())
+  tenantId        String
+  userId          Int       @unique
+  
+  // Academic Foreign Keys (Mapped to tables above)
+  batchId         Int?
+  departmentId    Int?
+  passingYearId   Int?
+
+  // Personal Details
+  first_name      String
+  last_name       String
+  official_email  String?   // Your custom XAMPP feature!
+  nickname        String?
+  phone           String?
+  dob             DateTime?
+  blood_group     String?
+  gender          String?
+  about_me        String?   @db.Text
+  
+  // Professional Details
+  company         String?
+  designation     String?
+  
+  // Media Files (Paths)
+  profile_pic     String?
+  cover_photo     String?
+  
+  // Social Links
+  facebook_url    String?
+  twitter_url     String?
+  linkedin_url    String?
+  instagram_url   String?
+  github_url      String?
+  
+  // Location Details
+  country_id      Int?      // We will map this when we build the XAMPP Country table
+  state           String?
+  city            String?
+  zip             String?
+  address         String?   @db.Text
+  
+  status          Int       @default(1)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Prisma Relational Mappings
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch           Batch?       @relation(fields: [batchId], references: [id])
+  department      Department?  @relation(fields: [departmentId], references: [id])
+  passingYear     PassingYear? @relation(fields: [passingYearId], references: [id])
+}
