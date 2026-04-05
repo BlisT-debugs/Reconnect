@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getProfile, upsertProfile } = require('../controllers/alumniController');
+const { getProfile, upsertProfile, getAllAlumni } = require('../controllers/alumniController');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -16,5 +16,6 @@ router.post('/upload', protect, upload.single('profile_pic'), (req, res) => {
         filePath: `/${req.file.path.replace(/\\/g, '/')}` // Normalizes Windows slashes to Web slashes
     });
 });
+router.get('/directory', protect, getAllAlumni);
 
 module.exports = router;

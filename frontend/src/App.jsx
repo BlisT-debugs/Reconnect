@@ -4,6 +4,7 @@ import Register from './pages/public/Register';
 import Login from './pages/public/Login';
 import Dashboard from './pages/alumni/Dashboard';
 import EditProfile from './pages/alumni/EditProfile';
+import Directory from './pages/alumni/Directory';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/directory" element={<Directory />} />
       </Routes>
     </Router>
   );

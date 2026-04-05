@@ -52,6 +52,11 @@ const Dashboard = () => {
                     Complete Your Profile
                 </button>
             </Link>
+            <Link to="/directory">
+                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer' }}>
+                    View Alumni Directory
+                </button>
+            </Link>
             <div style={{ padding: '20px', backgroundColor: '#f4f4f9', borderRadius: '8px', marginTop: '20px' }}>
                 <h2>Welcome back, {userData.name}!</h2>
                 <p><strong>Email:</strong> {userData.email}</p>

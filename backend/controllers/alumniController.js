@@ -33,6 +33,10 @@ const upsertProfile = async (req, res) => {
             return res.status(400).json({ message: 'First name and Last name are required' });
         }
 
+        if (official_email && !official_email.endsWith('@srmist.edu.in')) {
+            return res.status(400).json({ message: 'Official Email must belong to the @srmist.edu.in domain' });
+        }
+
         // 2. MAGIC ACADEMIC LINKING: If user typed a Department String, find or create its ID!
         let departmentIdToSave = null;
         if (department) {
@@ -81,4 +85,25 @@ const upsertProfile = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, upsertProfile };
+// @desc    Get all alumni profiles for the directory
+// @route   GET /api/alumni/directory
+// @access  Private
+const getAllAlumni = async (req, res) => {
+    try {
+        // Fetch everyone in the same tenant (college)
+        const alumni = await prisma.alumnus.findMany({
+            where: { tenantId: req.user.tenantId },
+            include: {
+                user: { select: { name: true, email: true } }, // Get base user info safely
+                batch: true,
+                department: true,
+                passingYear: true
+            }
+        });
+        res.json(alumni);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getProfile, upsertProfile, getAllAlumni };
