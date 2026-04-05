@@ -1,10 +1,10 @@
-// frontend/src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Register from './pages/public/Register';
 import Login from './pages/public/Login';
 import Dashboard from './pages/alumni/Dashboard';
 import EditProfile from './pages/alumni/EditProfile';
 import Directory from './pages/alumni/Directory';
+import Jobs from './pages/alumni/Jobs';
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/directory" element={<Directory />} />
+        <Route path="/jobs" element={<Jobs />} />
       </Routes>
     </Router>
   );

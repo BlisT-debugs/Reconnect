@@ -15,6 +15,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/alumni', require('./routes/alumniRoutes'));
+app.use('/api/jobs', require('./routes/jobRoutes'));
 
 app.get('/', (req, res) => {
     res.send('PERN Alumni API is online and waiting...');

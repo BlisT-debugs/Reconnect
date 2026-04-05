@@ -23,11 +23,12 @@ model Tenant {
   domains      Domain[]
   users        User[]
   alumni       Alumnus[]
-  
-  // <-- The 3 missing lines Prisma was asking for! -->
   batches      Batch[]
   departments  Department[]
   passingYears PassingYear[]
+  jobs         Job[]
+
+
 }
 
 model Domain {
@@ -56,6 +57,7 @@ model User {
 
   tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   alumnusProfile    Alumnus?  // One-to-One relationship
+  jobs         Job[]
 }
 
 // ------------------------------------------------------
@@ -153,4 +155,30 @@ model Alumnus {
   batch           Batch?       @relation(fields: [batchId], references: [id])
   department      Department?  @relation(fields: [departmentId], references: [id])
   passingYear     PassingYear? @relation(fields: [passingYearId], references: [id])
+}
+
+// ------------------------------------------------------
+// JOB BOARD MODULE
+// ------------------------------------------------------
+model Job {
+  id                  Int       @id @default(autoincrement())
+  tenantId            String
+  userId              Int       // The alumnus who posted the job
+  
+  title               String
+  company             String
+  location            String?
+  description         String    @db.Text
+  salary_range        String?
+  experience_required String?
+  apply_link          String?   // URL or email to apply
+  deadline            DateTime?
+  
+  status              Int       @default(1) // 1 = Active, 0 = Closed
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Prisma Relational Mappings
+  tenant              Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  postedBy            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

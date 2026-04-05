@@ -57,6 +57,11 @@ const Dashboard = () => {
                     View Alumni Directory
                 </button>
             </Link>
+            <Link to="/jobs">
+                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#17a2b8', color: 'white', border: 'none', cursor: 'pointer' }}>
+                    Job Board
+                </button>
+            </Link>
             <div style={{ padding: '20px', backgroundColor: '#f4f4f9', borderRadius: '8px', marginTop: '20px' }}>
                 <h2>Welcome back, {userData.name}!</h2>
                 <p><strong>Email:</strong> {userData.email}</p>
