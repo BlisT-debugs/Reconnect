@@ -99,7 +99,7 @@ model PassingYear {
 }
 
 // ------------------------------------------------------
-// EXACT XAMPP ALUMNUS PROFILE 
+// ALUMNUS PROFILE 
 // ------------------------------------------------------
 model Alumnus {
   id              Int       @id @default(autoincrement())
@@ -128,7 +128,6 @@ model Alumnus {
   
   // Media Files (Paths)
   profile_pic     String?
-  cover_photo     String?
   
   // Social Links
   facebook_url    String?

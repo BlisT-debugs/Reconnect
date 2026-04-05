@@ -1,68 +1,78 @@
 const prisma = require('../config/prisma');
 
-// @desc    Get current user's alumni profile
-// @route   GET /api/alumni/profile
-// @access  Private
 const getProfile = async (req, res) => {
     try {
         const profile = await prisma.alumnus.findUnique({
             where: { userId: req.user.id },
             include: {
-                batch: true,         // Automatically fetches the batch name!
-                department: true,    // Automatically fetches the department name!
+                batch: true,         
+                department: true,    
                 passingYear: true
             }
         });
 
-        if (!profile) {
-            return res.status(404).json({ message: 'Profile not created yet' });
-        }
+        if (!profile) return res.status(404).json({ message: 'Profile not created yet' });
         res.json(profile);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Create or Update alumni profile
-// @route   POST /api/alumni/profile
-// @access  Private
 const upsertProfile = async (req, res) => {
     try {
-        // Extract all the fields from the request body
+        // 1. ADDED profile_pic! We also changed the academic fields to text strings.
         const {
             first_name, last_name, official_email, nickname, phone, dob,
             blood_group, gender, about_me, company, designation,
             facebook_url, twitter_url, linkedin_url, instagram_url, github_url,
-            state, city, zip, address,
-            batchId, departmentId, passingYearId
+            state, city, zip, address, profile_pic, 
+            batch, department, passing_year 
         } = req.body;
 
-        // Basic validation
         if (!first_name || !last_name) {
             return res.status(400).json({ message: 'First name and Last name are required' });
         }
 
-        // Map the data safely
+        // 2. MAGIC ACADEMIC LINKING: If user typed a Department String, find or create its ID!
+        let departmentIdToSave = null;
+        if (department) {
+            let existingDept = await prisma.department.findFirst({ where: { name: department, tenantId: req.user.tenantId } });
+            if (!existingDept) existingDept = await prisma.department.create({ data: { name: department, tenantId: req.user.tenantId } });
+            departmentIdToSave = existingDept.id;
+        }
+
+        let batchIdToSave = null;
+        if (batch) {
+            let existingBatch = await prisma.batch.findFirst({ where: { name: batch, tenantId: req.user.tenantId } });
+            if (!existingBatch) existingBatch = await prisma.batch.create({ data: { name: batch, tenantId: req.user.tenantId } });
+            batchIdToSave = existingBatch.id;
+        }
+
+        let passingYearIdToSave = null;
+        if (passing_year) {
+            let existingYear = await prisma.passingYear.findFirst({ where: { name: passing_year, tenantId: req.user.tenantId } });
+            if (!existingYear) existingYear = await prisma.passingYear.create({ data: { name: passing_year, tenantId: req.user.tenantId } });
+            passingYearIdToSave = existingYear.id;
+        }
+
+        // 3. Map the data safely
         const profileData = {
-            tenantId: req.user.tenantId, // Locked to their specific college
+            tenantId: req.user.tenantId, 
             first_name, last_name, official_email, nickname, phone, 
-            dob: dob ? new Date(dob) : null, // Convert string to Date object
+            dob: dob ? new Date(dob) : null,
             blood_group, gender, about_me, company, designation,
             facebook_url, twitter_url, linkedin_url, instagram_url, github_url,
-            state, city, zip, address,
-            batchId: batchId ? parseInt(batchId) : null,
-            departmentId: departmentId ? parseInt(departmentId) : null,
-            passingYearId: passingYearId ? parseInt(passingYearId) : null,
+            state, city, zip, address, 
+            profile_pic, // <-- Now it will actually save to PostgreSQL!
+            batchId: batchIdToSave,
+            departmentId: departmentIdToSave,
+            passingYearId: passingYearIdToSave,
         };
 
-        // UPSERT: If profile exists for this user, update it. If not, create it.
         const profile = await prisma.alumnus.upsert({
             where: { userId: req.user.id },
             update: profileData,
-            create: {
-                ...profileData,
-                userId: req.user.id
-            }
+            create: { ...profileData, userId: req.user.id }
         });
 
         res.json(profile);
