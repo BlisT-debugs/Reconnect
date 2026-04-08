@@ -52,6 +52,13 @@ const Dashboard = () => {
                     Complete Your Profile
                 </button>
             </Link>
+            {userData.role === 'admin' && (
+            <Link to="/admin">
+                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                    Admin Panel
+                </button>
+            </Link>
+        )}
             <Link to="/directory">
                 <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer' }}>
                     View Alumni Directory

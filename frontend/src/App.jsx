@@ -6,20 +6,27 @@ import EditProfile from './pages/alumni/EditProfile';
 import Directory from './pages/alumni/Directory';
 import Jobs from './pages/alumni/Jobs';
 import Events from './pages/alumni/Events';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import Layout from './components/Layout'; // <-- Import your new Layout!
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Default route redirects to Register for now */}
-        <Route path="/" element={<Navigate to="/register" />} />
+        {/* PUBLIC ROUTES (No Sidebar) */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/directory" element={<Directory />} />
-        <Route path="/jobs" element={<Jobs />} />
-        <Route path="/events" element={<Events />} />
+        
+        {/* PRIVATE ROUTES (Wrapped inside the Sidebar Layout) */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/directory" element={<Directory />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
       </Routes>
     </Router>
   );
