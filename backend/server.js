@@ -9,13 +9,17 @@ const app = express();
 
 app.use(express.json()); 
 app.use(cors());         
-app.use(helmet());       
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));     
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/alumni', require('./routes/alumniRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
+app.use('/api/events', require('./routes/eventRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.get('/', (req, res) => {
     res.send('PERN Alumni API is online and waiting...');

@@ -5,6 +5,7 @@ import Dashboard from './pages/alumni/Dashboard';
 import EditProfile from './pages/alumni/EditProfile';
 import Directory from './pages/alumni/Directory';
 import Jobs from './pages/alumni/Jobs';
+import Events from './pages/alumni/Events';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/directory" element={<Directory />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/events" element={<Events />} />
       </Routes>
     </Router>
   );

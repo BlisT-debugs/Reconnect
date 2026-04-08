@@ -62,6 +62,11 @@ const Dashboard = () => {
                     Job Board
                 </button>
             </Link>
+            <Link to="/events">
+                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#ffc107', color: '#000', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                    Campus Events
+                </button>
+            </Link>
             <div style={{ padding: '20px', backgroundColor: '#f4f4f9', borderRadius: '8px', marginTop: '20px' }}>
                 <h2>Welcome back, {userData.name}!</h2>
                 <p><strong>Email:</strong> {userData.email}</p>

@@ -27,6 +27,7 @@ model Tenant {
   departments  Department[]
   passingYears PassingYear[]
   jobs         Job[]
+  events       Event[]
 
 
 }
@@ -181,4 +182,25 @@ model Job {
   // Prisma Relational Mappings
   tenant              Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   postedBy            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// EVENTS MODULE
+// ------------------------------------------------------
+model Event {
+  id            Int      @id @default(autoincrement())
+  tenantId      String
+  
+  title         String
+  description   String   @db.Text
+  date          DateTime
+  location      String
+  banner_image  String?  // URL path for the uploaded poster
+  
+  status        Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Prisma Relational Mapping
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
