@@ -7,7 +7,9 @@ import Directory from './pages/alumni/Directory';
 import Jobs from './pages/alumni/Jobs';
 import Events from './pages/alumni/Events';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import Layout from './components/Layout'; // <-- Import your new Layout!
+import Layout from './components/Layout'; 
+import News from './pages/alumni/News';
+import Notices from './pages/alumni/Notices';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/events" element={<Events />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/notices" element={<Notices />} />
         </Route>
       </Routes>
     </Router>

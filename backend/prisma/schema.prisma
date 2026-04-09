@@ -28,6 +28,10 @@ model Tenant {
   passingYears PassingYear[]
   jobs         Job[]
   events       Event[]
+  newsCategories   NewsCategory[]
+  news             News[]
+  noticeCategories NoticeCategory[]
+  notices          Notice[]
 
 
 }
@@ -203,4 +207,61 @@ model Event {
 
   // Prisma Relational Mapping
   tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// NEWS & NOTICES MODULE (XAMPP Replica)
+// ------------------------------------------------------
+
+model NewsCategory {
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  name      String
+  
+  news      News[]
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  categoryId  Int
+  
+  title       String
+  image       String?  // URL path for the news thumbnail
+  details     String   @db.Text
+  date        DateTime @default(now())
+  status      Int      @default(1) // 1 = Published, 0 = Draft
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    NewsCategory @relation(fields: [categoryId], references: [id])
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model NoticeCategory {
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  name      String
+  
+  notices   Notice[]
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Notice {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  categoryId  Int
+  
+  title       String
+  details     String   @db.Text
+  date        DateTime @default(now())
+  status      Int      @default(1)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    NoticeCategory @relation(fields: [categoryId], references: [id])
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

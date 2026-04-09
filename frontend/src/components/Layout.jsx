@@ -56,6 +56,8 @@ const Layout = () => {
                     <Link to="/directory" style={linkStyle('/directory')}>👥 Directory</Link>
                     <Link to="/jobs" style={linkStyle('/jobs')}>💼 Job Board</Link>
                     <Link to="/events" style={linkStyle('/events')}>📅 Events</Link>
+                    <Link to="/news" style={linkStyle('/news')}>📰 News</Link>
+                    <Link to="/notices" style={linkStyle('/notices')}>📌 Notices</Link>
                     
                     {/* Only Admins see this link */}
                     {role === 'admin' && (
