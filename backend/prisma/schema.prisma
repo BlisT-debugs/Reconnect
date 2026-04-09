@@ -32,6 +32,9 @@ model Tenant {
   news             News[]
   noticeCategories NoticeCategory[]
   notices          Notice[]
+  campaignCategories CampaignCategory[]
+  campaigns          Campaign[]
+  donations          Donation[]
 
 
 }
@@ -63,6 +66,8 @@ model User {
   tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   alumnusProfile    Alumnus?  // One-to-One relationship
   jobs         Job[]
+  campaigns          Campaign[]
+  donations          Donation[]
 }
 
 // ------------------------------------------------------
@@ -264,4 +269,56 @@ model Notice {
 
   category    NoticeCategory @relation(fields: [categoryId], references: [id])
   tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// FUNDRAISING & CAMPAIGNS MODULE
+// ------------------------------------------------------
+
+model CampaignCategory {
+  id        Int        @id @default(autoincrement())
+  tenantId  String
+  name      String
+  
+  campaigns Campaign[]
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Campaign {
+  id            Int      @id @default(autoincrement())
+  tenantId      String
+  categoryId    Int
+  userId        Int      // The user/admin who organized it
+  
+  title         String
+  description   String   @db.Text
+  image         String?  // Optional banner
+  target_amount Float    // How much they want to raise
+  raised_amount Float    @default(0) // Automatically tracked
+  deadline      DateTime
+  status        Int      @default(1) 
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category      CampaignCategory @relation(fields: [categoryId], references: [id])
+  organizer     User             @relation(fields: [userId], references: [id])
+  donations     Donation[]
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Donation {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  campaignId  Int
+  userId      Int      // The alumnus who donated
+  
+  amount      Float
+  status      String   @default("completed") // Will tie to payment gateways later
+  
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  donor       User     @relation(fields: [userId], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

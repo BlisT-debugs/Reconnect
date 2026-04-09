@@ -10,6 +10,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import Layout from './components/Layout'; 
 import News from './pages/alumni/News';
 import Notices from './pages/alumni/Notices';
+import Campaigns from './pages/alumni/Campaigns';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/news" element={<News />} />
           <Route path="/notices" element={<Notices />} />
+          <Route path="/campaigns" element={<Campaigns />} />
         </Route>
       </Routes>
     </Router>
