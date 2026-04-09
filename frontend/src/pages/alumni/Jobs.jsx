@@ -1,54 +1,64 @@
+// frontend/src/pages/alumni/Jobs.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
 
 const Jobs = () => {
-    const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [role, setRole] = useState('user');
+    const [currentUserId, setCurrentUserId] = useState(null);
     
-    // State for the "Post a Job" form
     const [formData, setFormData] = useState({
         title: '', company: '', location: '', description: '',
         salary_range: '', experience_required: '', apply_link: '', deadline: ''
     });
 
-    const fetchJobs = async () => {
+    const fetchData = async () => {
         try {
             const token = localStorage.getItem('token');
-            const { data } = await API.get('/jobs', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // Get user role for permissions
+            const userRes = await API.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+            setRole(userRes.data.role);
+            setCurrentUserId(userRes.data.id);
+
+            // Get jobs
+            const { data } = await API.get('/jobs', { headers: { Authorization: `Bearer ${token}` } });
             setJobs(data);
             setLoading(false);
         } catch (err) {
-            console.error('Failed to fetch jobs', err);
+            console.error("Failed to fetch data:", err);
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchJobs();
-    }, []);
+    useEffect(() => { fetchData(); }, []);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-            await API.post('/jobs', formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await API.post('/jobs', formData, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             alert('Job Posted Successfully!');
-            setShowModal(false); // Close the popup
-            setFormData({ title: '', company: '', location: '', description: '', salary_range: '', experience_required: '', apply_link: '', deadline: '' }); // Clear form
-            fetchJobs(); // Refresh the job list instantly
-        } catch (err) {
-            alert('Error posting job');
+            setShowModal(false);
+            setFormData({ title: '', company: '', location: '', description: '', salary_range: '', experience_required: '', apply_link: '', deadline: '' }); 
+            fetchData();
+        } catch (err) { 
+            alert('Error posting job'); 
+            console.error(err);
+        }
+    };
+
+    // --- Master Delete Function ---
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to permanently delete this job?')) return;
+        try {
+            await API.delete(`/admin/moderate/job/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+            fetchData(); // Refresh list instantly
+        } catch (err) { 
+            alert('Failed to delete job. Admin access required.'); 
+            console.error(err);
         }
     };
 
@@ -56,50 +66,43 @@ const Jobs = () => {
 
     return (
         <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
-            
-            {/* Header & Controls */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ color: '#007bff' }}>Alumni Job Board</h1>
-                <div>
-                    <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', marginRight: '10px' }}>
-                        + Post a Job
-                    </button>
-                    <button onClick={() => navigate('/dashboard')} style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        Dashboard
-                    </button>
-                </div>
+                <h1 style={{ color: '#007bff', margin: 0 }}>Alumni Job Board</h1>
+                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ Post a Job</button>
             </div>
 
-            {/* Grid of Job Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                 {jobs.map((job) => (
-                    <div key={job.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', border: '1px solid #333', display: 'flex', flexDirection: 'column' }}>
-                        <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: '#fff' }}>{job.title}</h3>
-                        <p style={{ margin: '0 0 15px 0', fontSize: '16px', color: '#007bff', fontWeight: 'bold' }}>{job.company}</p>
+                    <div key={job.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', border: '1px solid #333', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                         
+                        {/* --- Admin / Owner Controls --- */}
+                        {(role === 'admin' || currentUserId === job.userId) && (
+                            <div style={{ position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '5px' }}>
+                                <button onClick={() => alert('Edit functionality coming soon!')} style={{ background: '#ffc107', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold', color: '#000' }}>Edit</button>
+                                <button onClick={() => handleDelete(job.id)} style={{ background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                            </div>
+                        )}
+
+                        <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: '#fff', paddingRight: '100px' }}>{job.title}</h3>
+                        <p style={{ margin: '0 0 15px 0', fontSize: '16px', color: '#007bff', fontWeight: 'bold' }}>{job.company}</p>
                         <div style={{ fontSize: '14px', color: '#ccc', marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <span>📍 {job.location || 'Remote / Not specified'}</span>
+                            <span>📍 {job.location || 'Remote'}</span>
                             <span>💼 Exp: {job.experience_required || 'Not specified'}</span>
                             <span>💰 {job.salary_range || 'Competitive'}</span>
                         </div>
-                        
                         <p style={{ fontSize: '14px', color: '#aaa', flexGrow: 1 }}>{job.description}</p>
                         
                         <div style={{ marginTop: '15px', borderTop: '1px solid #444', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '12px', color: '#777' }}>Posted by: {job.postedBy.name}</span>
+                            <span style={{ fontSize: '12px', color: '#777' }}>Posted by: {job.postedBy?.name || 'Unknown'}</span>
                             {job.apply_link && (
-                                <a href={job.apply_link.startsWith('http') ? job.apply_link : `mailto:${job.apply_link}`} target="_blank" rel="noreferrer" style={{ padding: '8px 15px', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '14px' }}>
-                                    Apply Now
-                                </a>
+                                <a href={job.apply_link.startsWith('http') ? job.apply_link : `mailto:${job.apply_link}`} target="_blank" rel="noreferrer" style={{ padding: '8px 15px', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '14px' }}>Apply</a>
                             )}
                         </div>
                     </div>
                 ))}
             </div>
 
-            {jobs.length === 0 && <p style={{ textAlign: 'center', color: '#aaa', marginTop: '40px' }}>No active jobs found. Be the first to post one!</p>}
-
-            {/* --- MODAL FOR POSTING A NEW JOB --- */}
+            {/* Post Job Modal */}
             {showModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
                     <div style={{ backgroundColor: '#1e1e2f', padding: '30px', borderRadius: '8px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>

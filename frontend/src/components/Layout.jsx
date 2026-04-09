@@ -59,11 +59,13 @@ const Layout = () => {
                     <Link to="/news" style={linkStyle('/news')}>📰 News</Link>
                     <Link to="/notices" style={linkStyle('/notices')}>📌 Notices</Link>
                     <Link to="/campaigns" style={linkStyle('/campaigns')}>💰 Campaigns</Link>
+                    <Link to="/elections" style={linkStyle('/elections')}>🗳️ Elections</Link>
                     
                     {/* Only Admins see this link */}
                     {role === 'admin' && (
                         <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #444' }}>
                             <Link to="/admin" style={linkStyle('/admin')}>🔒 Admin Panel</Link>
+                            <Link to="/moderation" style={linkStyle('/moderation')}>☢️ Moderation</Link>
                         </div>
                     )}
                 </div>

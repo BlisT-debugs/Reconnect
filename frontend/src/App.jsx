@@ -11,6 +11,8 @@ import Layout from './components/Layout';
 import News from './pages/alumni/News';
 import Notices from './pages/alumni/Notices';
 import Campaigns from './pages/alumni/Campaigns';
+import Elections from './pages/alumni/Elections';
+import Moderation from './pages/admin/Moderation';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/notices" element={<Notices />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/elections" element={<Elections />} />
+          <Route path="/moderation" element={<Moderation />} />
         </Route>
       </Routes>
     </Router>

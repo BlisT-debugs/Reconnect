@@ -1,3 +1,4 @@
+// frontend/src/pages/alumni/Notices.jsx
 import { useState, useEffect } from 'react';
 import API from '../../services/api';
 
@@ -5,20 +6,25 @@ const Notices = () => {
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [role, setRole] = useState('user');
     const [formData, setFormData] = useState({ title: '', details: '', categoryName: '' });
 
-    const fetchNotices = async () => {
+    const fetchData = async () => {
         try {
             const token = localStorage.getItem('token');
+            const userRes = await API.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+            setRole(userRes.data.role);
+
             const { data } = await API.get('/content/notices', { headers: { Authorization: `Bearer ${token}` } });
             setNotices(data);
             setLoading(false);
-        } catch (err) {
-            setLoading(false);
+        } catch (err) { 
+            console.error("Failed to fetch notices", err);
+            setLoading(false); 
         }
     };
 
-    useEffect(() => { fetchNotices(); }, []);
+    useEffect(() => { fetchData(); }, []);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -30,9 +36,22 @@ const Notices = () => {
             alert('Notice Posted Successfully!');
             setShowModal(false);
             setFormData({ title: '', details: '', categoryName: '' });
-            fetchNotices();
+            fetchData();
         } catch (err) {
             alert('Error posting notice');
+            console.error(err);
+        }
+    };
+
+    // --- Master Delete Function ---
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to permanently delete this Notice?')) return;
+        try {
+            await API.delete(`/admin/moderate/notice/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+            fetchData(); 
+        } catch (err) { 
+            alert('Failed to delete. Admin access required.'); 
+            console.error(err);
         }
     };
 
@@ -41,15 +60,23 @@ const Notices = () => {
     return (
         <div style={{ maxWidth: '900px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ color: '#ff4d4d' }}>Official Notices</h1>
-                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+ Post Notice</button>
+                <h1 style={{ color: '#ff4d4d', margin: 0 }}>Official Notices</h1>
+                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ Post Notice</button>
             </div>
 
-            {/* List of Notices (Vertical layout because they are text-heavy) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {notices.map((notice) => (
-                    <div key={notice.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ff4d4d' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div key={notice.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ff4d4d', position: 'relative' }}>
+                        
+                        {/* --- Admin Controls --- */}
+                        {role === 'admin' && (
+                            <div style={{ position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '5px' }}>
+                                <button onClick={() => alert('Edit functionality coming soon!')} style={{ background: '#ffc107', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold', color: '#000' }}>Edit</button>
+                                <button onClick={() => handleDelete(notice.id)} style={{ background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                            </div>
+                        )}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: '120px' }}>
                             <h3 style={{ margin: '0 0 10px 0', fontSize: '20px' }}>{notice.title}</h3>
                             <span style={{ fontSize: '12px', backgroundColor: '#333', padding: '4px 10px', borderRadius: '15px', color: '#ccc' }}>{notice.category?.name}</span>
                         </div>

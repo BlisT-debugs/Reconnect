@@ -1,28 +1,32 @@
+// frontend/src/pages/alumni/News.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
 
 const News = () => {
-    const navigate = useNavigate();
     const [newsList, setNewsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [role, setRole] = useState('user');
     
     const [formData, setFormData] = useState({ title: '', details: '', categoryName: '' });
     const [imageFile, setImageFile] = useState(null);
 
-    const fetchNews = async () => {
+    const fetchData = async () => {
         try {
             const token = localStorage.getItem('token');
+            const userRes = await API.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+            setRole(userRes.data.role);
+
             const { data } = await API.get('/content/news', { headers: { Authorization: `Bearer ${token}` } });
             setNewsList(data);
             setLoading(false);
-        } catch (err) {
-            setLoading(false);
+        } catch (err) { 
+            console.error("Failed to fetch news", err);
+            setLoading(false); 
         }
     };
 
-    useEffect(() => { fetchNews(); }, []);
+    useEffect(() => { fetchData(); }, []);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
     const handleImageChange = (e) => setImageFile(e.target.files[0]);
@@ -33,17 +37,15 @@ const News = () => {
             const token = localStorage.getItem('token');
             let uploadedImagePath = '';
 
-            // Upload the thumbnail image first
             if (imageFile) {
                 const uploadData = new FormData();
-                uploadData.append('profile_pic', imageFile); // Reusing our multer setup
+                uploadData.append('profile_pic', imageFile); 
                 const uploadRes = await API.post('/alumni/upload', uploadData, {
                     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
                 });
                 uploadedImagePath = uploadRes.data.filePath; 
             }
 
-            // Save the News Article
             await API.post('/content/news', { ...formData, image: uploadedImagePath }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -52,9 +54,22 @@ const News = () => {
             setShowModal(false);
             setFormData({ title: '', details: '', categoryName: '' });
             setImageFile(null);
-            fetchNews();
+            fetchData();
         } catch (err) {
             alert('Error publishing news');
+            console.error(err);
+        }
+    };
+
+    // --- Master Delete Function ---
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to permanently delete this News Article?')) return;
+        try {
+            await API.delete(`/admin/moderate/news/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+            fetchData(); 
+        } catch (err) { 
+            alert('Failed to delete. Admin access required.'); 
+            console.error(err);
         }
     };
 
@@ -63,30 +78,34 @@ const News = () => {
     return (
         <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ color: '#17a2b8' }}>Campus News & Updates</h1>
-                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>+ Publish News</button>
+                <h1 style={{ color: '#17a2b8', margin: 0 }}>Campus News</h1>
+                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ Publish News</button>
             </div>
 
-            {/* News Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                 {newsList.map((item) => (
-                    <div key={item.id} style={{ backgroundColor: '#1e1e2f', borderRadius: '8px', border: '1px solid #333', overflow: 'hidden' }}>
+                    <div key={item.id} style={{ backgroundColor: '#1e1e2f', borderRadius: '8px', border: '1px solid #333', overflow: 'hidden', position: 'relative' }}>
+                        
+                        {/* --- Admin Controls --- */}
+                        {role === 'admin' && (
+                            <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '5px', zIndex: 10 }}>
+                                <button onClick={() => alert('Edit functionality coming soon!')} style={{ background: '#ffc107', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold', color: '#000' }}>Edit</button>
+                                <button onClick={() => handleDelete(item.id)} style={{ background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                            </div>
+                        )}
+
                         <div style={{ height: '180px', backgroundColor: '#2a2a3c' }}>
-                            {item.image ? (
-                                <img src={`http://localhost:5000${item.image}`} alt="News Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>No Image</div>
-                            )}
+                            {item.image ? <img src={`http://localhost:5000${item.image}`} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>No Image</div>}
                         </div>
                         <div style={{ padding: '20px' }}>
                             <span style={{ fontSize: '12px', backgroundColor: '#17a2b8', color: '#000', padding: '3px 8px', borderRadius: '12px', fontWeight: 'bold' }}>{item.category?.name}</span>
-                            <h3 style={{ margin: '10px 0', fontSize: '18px' }}>{item.title}</h3>
+                            <h3 style={{ margin: '10px 0', fontSize: '18px', paddingRight: '90px' }}>{item.title}</h3>
                             <p style={{ fontSize: '14px', color: '#aaa', marginBottom: '10px' }}>{new Date(item.date).toLocaleDateString()}</p>
                             <p style={{ fontSize: '14px', color: '#ccc', margin: 0 }}>{item.details}</p>
                         </div>
                     </div>
                 ))}
-                {newsList.length === 0 && <p style={{ color: '#aaa' }}>No news published yet.</p>}
+                {newsList.length === 0 && <p style={{ color: '#aaa', gridColumn: '1 / -1' }}>No news published yet.</p>}
             </div>
 
             {/* Post News Modal */}

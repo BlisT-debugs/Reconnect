@@ -35,6 +35,13 @@ model Tenant {
   campaignCategories CampaignCategory[]
   campaigns          Campaign[]
   donations          Donation[]
+  committeeCategories  CommitteeCategory[]
+  committeeDesignations CommitteeDesignation[]
+  committees           Committee[]
+  committeeMembers     CommitteeBoardMember[]
+  elections            CommitteeElection[]
+  candidates           CommitteeCandidate[]
+  votes                CommitteeVote[]
 
 
 }
@@ -68,6 +75,9 @@ model User {
   jobs         Job[]
   campaigns          Campaign[]
   donations          Donation[]
+  committeeMemberships CommitteeBoardMember[]
+  candidacies          CommitteeCandidate[]
+  votesCast            CommitteeVote[]
 }
 
 // ------------------------------------------------------
@@ -321,4 +331,103 @@ model Donation {
   campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   donor       User     @relation(fields: [userId], references: [id])
   tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// COMMITTEE & ELECTIONS MODULE
+// ------------------------------------------------------
+
+model CommitteeCategory {
+  id          Int         @id @default(autoincrement())
+  tenantId    String
+  name        String
+  committees  Committee[]
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeDesignation {
+  id          Int         @id @default(autoincrement())
+  tenantId    String
+  name        String
+  candidates  CommitteeCandidate[]
+  members     CommitteeBoardMember[]
+  votes       CommitteeVote[]
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Committee {
+  id          Int       @id @default(autoincrement())
+  tenantId    String
+  categoryId  Int
+  name        String
+  description String?   @db.Text
+  status      Int       @default(1)
+
+  category    CommitteeCategory @relation(fields: [categoryId], references: [id])
+  members     CommitteeBoardMember[]
+  elections   CommitteeElection[]
+  tenant      Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeBoardMember {
+  id            Int       @id @default(autoincrement())
+  tenantId      String
+  committeeId   Int
+  userId        Int
+  designationId Int
+
+  committee     Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeElection {
+  id            Int       @id @default(autoincrement())
+  tenantId      String
+  committeeId   Int
+  title         String
+  start_date    DateTime
+  end_date      DateTime
+  status        Int       @default(1) // 1 = Active, 0 = Closed
+
+  committee     Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+  candidates    CommitteeCandidate[]
+  votes         CommitteeVote[]
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeCandidate {
+  id            Int       @id @default(autoincrement())
+  tenantId      String
+  electionId    Int
+  userId        Int
+  designationId Int
+  manifesto     String?   @db.Text
+  votes_count   Int       @default(0)
+  status        Int       @default(1) // Assuming 1 is approved for test purposes
+
+  election      CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
+  votes         CommitteeVote[]
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeVote {
+  id            Int       @id @default(autoincrement())
+  tenantId      String
+  electionId    Int
+  voterId       Int
+  candidateId   Int
+  designationId Int       // We track the role so we can block double-voting
+
+  election      CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  voter         User                 @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  candidate     CommitteeCandidate   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // CRITICAL DATABASE SECURITY: A user can only vote ONCE per designation in a specific election
+  @@unique([electionId, voterId, designationId]) 
 }
