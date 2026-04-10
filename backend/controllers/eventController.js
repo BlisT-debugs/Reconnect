@@ -43,4 +43,22 @@ const createEvent = async (req, res) => {
     }
 };
 
-module.exports = { getEvents, createEvent };
+// @desc    Update an existing event
+// @route   PUT /api/events/:id
+const updateEvent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, date, location, banner_image } = req.body;
+
+        const updateData = { title, description, date: new Date(date), location };
+        if (banner_image) updateData.banner_image = banner_image; // Only update image if a new one was uploaded
+
+        await prisma.event.updateMany({
+            where: { id: parseInt(id), tenantId: req.user.tenantId },
+            data: updateData
+        });
+        res.json({ message: 'Event updated successfully' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getEvents, createEvent, updateEvent };

@@ -52,5 +52,23 @@ const createJob = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// @desc    Update an existing job
+// @route   PUT /api/jobs/:id
+// @access  Private (Owner or Admin)
+const updateJob = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, company, location, description, salary_range, experience_required, apply_link, deadline } = req.body;
 
-module.exports = { getJobs, createJob };
+        await prisma.job.updateMany({
+            where: { id: parseInt(id), tenantId: req.user.tenantId },
+            data: {
+                title, company, location, description, salary_range, experience_required, apply_link,
+                deadline: deadline ? new Date(deadline) : null,
+            }
+        });
+        res.json({ message: 'Job updated successfully' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getJobs, createJob,updateJob };

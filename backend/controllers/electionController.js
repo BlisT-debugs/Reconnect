@@ -98,4 +98,23 @@ const setupTestElection = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-module.exports = { getElections, castVote, setupTestElection };
+// @desc    Update an existing election
+// @route   PUT /api/elections/:id
+const updateElection = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, start_date, end_date } = req.body;
+
+        await prisma.committeeElection.updateMany({
+            where: { id: parseInt(id), tenantId: req.user.tenantId },
+            data: {
+                title,
+                start_date: new Date(start_date),
+                end_date: new Date(end_date)
+            }
+        });
+        res.json({ message: 'Election updated successfully' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getElections, castVote, setupTestElection, updateElection };

@@ -1,4 +1,3 @@
-// frontend/src/pages/alumni/Notices.jsx
 import { useState, useEffect } from 'react';
 import API from '../../services/api';
 
@@ -7,6 +6,11 @@ const Notices = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [role, setRole] = useState('user');
+    
+    // Edit States
+    const [editMode, setEditMode] = useState(false);
+    const [editId, setEditId] = useState(null);
+
     const [formData, setFormData] = useState({ title: '', details: '', categoryName: '' });
 
     const fetchData = async () => {
@@ -18,41 +22,53 @@ const Notices = () => {
             const { data } = await API.get('/content/notices', { headers: { Authorization: `Bearer ${token}` } });
             setNotices(data);
             setLoading(false);
-        } catch (err) { 
-            console.error("Failed to fetch notices", err);
-            setLoading(false); 
-        }
+        } catch (err) { setLoading(false); }
     };
 
     useEffect(() => { fetchData(); }, []);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+    const handleAddNew = () => {
+        setEditMode(false);
+        setEditId(null);
+        setFormData({ title: '', details: '', categoryName: '' });
+        setShowModal(true);
+    };
+
+    const handleEdit = (notice) => {
+        setEditMode(true);
+        setEditId(notice.id);
+        setFormData({
+            title: notice.title,
+            details: notice.details,
+            categoryName: notice.category?.name || ''
+        });
+        setShowModal(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await API.post('/content/notices', formData, { headers: { Authorization: `Bearer ${token}` } });
-            alert('Notice Posted Successfully!');
+            if (editMode) {
+                await API.put(`/content/notices/${editId}`, formData, { headers: { Authorization: `Bearer ${token}` } });
+                alert('Notice Updated Successfully!');
+            } else {
+                await API.post('/content/notices', formData, { headers: { Authorization: `Bearer ${token}` } });
+                alert('Notice Posted Successfully!');
+            }
             setShowModal(false);
-            setFormData({ title: '', details: '', categoryName: '' });
             fetchData();
-        } catch (err) {
-            alert('Error posting notice');
-            console.error(err);
-        }
+        } catch (err) { alert('Error saving notice'); }
     };
 
-    // --- Master Delete Function ---
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to permanently delete this Notice?')) return;
         try {
             await API.delete(`/admin/moderate/notice/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             fetchData(); 
-        } catch (err) { 
-            alert('Failed to delete. Admin access required.'); 
-            console.error(err);
-        }
+        } catch (err) { alert('Failed to delete. Admin access required.'); }
     };
 
     if (loading) return <p style={{ textAlign: 'center', marginTop: '50px', color: 'white' }}>Loading Notices...</p>;
@@ -61,22 +77,21 @@ const Notices = () => {
         <div style={{ maxWidth: '900px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                 <h1 style={{ color: '#ff4d4d', margin: 0 }}>Official Notices</h1>
-                <button onClick={() => setShowModal(true)} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ Post Notice</button>
+                <button onClick={handleAddNew} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>+ Post Notice</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {notices.map((notice) => (
                     <div key={notice.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #ff4d4d', position: 'relative' }}>
                         
-                        {/* --- Admin Controls --- */}
                         {role === 'admin' && (
                             <div style={{ position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '5px' }}>
-                                <button onClick={() => alert('Edit functionality coming soon!')} style={{ background: '#ffc107', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold', color: '#000' }}>Edit</button>
+                                <button onClick={() => handleEdit(notice)} style={{ background: '#ffc107', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold', color: '#000' }}>Edit</button>
                                 <button onClick={() => handleDelete(notice.id)} style={{ background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', padding: '5px 10px', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: '120px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: role==='admin'?'120px':'0' }}>
                             <h3 style={{ margin: '0 0 10px 0', fontSize: '20px' }}>{notice.title}</h3>
                             <span style={{ fontSize: '12px', backgroundColor: '#333', padding: '4px 10px', borderRadius: '15px', color: '#ccc' }}>{notice.category?.name}</span>
                         </div>
@@ -87,17 +102,20 @@ const Notices = () => {
                 {notices.length === 0 && <p style={{ color: '#aaa', textAlign: 'center' }}>No official notices at this time.</p>}
             </div>
 
-            {/* Post Notice Modal */}
             {showModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
                     <div style={{ backgroundColor: '#1e1e2f', padding: '30px', borderRadius: '8px', width: '100%', maxWidth: '500px' }}>
-                        <h2 style={{ borderBottom: '1px solid #444', paddingBottom: '10px', marginTop: 0 }}>Post Official Notice</h2>
+                        <h2 style={{ borderBottom: '1px solid #444', paddingBottom: '10px', marginTop: 0 }}>
+                            {editMode ? 'Edit Notice' : 'Post Official Notice'}
+                        </h2>
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
                             <input type="text" name="title" placeholder="Notice Title *" value={formData.title} onChange={handleChange} required style={inputStyle} />
                             <input type="text" name="categoryName" placeholder="Category (e.g., Exam, Admin) *" value={formData.categoryName} onChange={handleChange} required style={inputStyle} />
                             <textarea name="details" placeholder="Notice Details *" value={formData.details} onChange={handleChange} required style={{ ...inputStyle, minHeight: '150px' }} />
                             <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Post Notice</button>
+                                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: editMode ? '#ffc107' : '#28a745', color: editMode ? '#000' : 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                    {editMode ? 'Save Changes' : 'Post Notice'}
+                                </button>
                                 <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
                             </div>
                         </form>

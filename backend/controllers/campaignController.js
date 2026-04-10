@@ -70,4 +70,30 @@ const processDonation = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-module.exports = { getCampaigns, createCampaign, processDonation };
+// @desc    Update an existing campaign
+// @route   PUT /api/campaigns/:id
+const updateCampaign = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, categoryName, target_amount, deadline, image } = req.body;
+
+        // Find or create category
+        let category = await prisma.campaignCategory.findFirst({ where: { name: categoryName, tenantId: req.user.tenantId } });
+        if (!category) category = await prisma.campaignCategory.create({ data: { name: categoryName, tenantId: req.user.tenantId } });
+
+        const updateData = { 
+            title, description, categoryId: category.id, 
+            target_amount: parseFloat(target_amount), 
+            deadline: new Date(deadline) 
+        };
+        if (image) updateData.image = image;
+
+        await prisma.campaign.updateMany({
+            where: { id: parseInt(id), tenantId: req.user.tenantId },
+            data: updateData
+        });
+        res.json({ message: 'Campaign updated successfully' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getCampaigns, createCampaign, processDonation, updateCampaign };
