@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Landing from './pages/public/Landing';
 import Register from './pages/public/Register';
 import Login from './pages/public/Login';
 import Dashboard from './pages/alumni/Dashboard';
@@ -19,7 +20,7 @@ function App() {
     <Router>
       <Routes>
         {/* PUBLIC ROUTES (No Sidebar) */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         
