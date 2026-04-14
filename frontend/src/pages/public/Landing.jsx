@@ -328,6 +328,7 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
 
 </section>
 
+{/*why join section */}
 <section className="py-20 px-6 md:px-10 bg-white">
 
   {/* 🔹 HEADER */}
@@ -337,7 +338,7 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
       Why Join the SRM Alumni Network?
     </h2>
 
-    <p className="text-gray-500 text-lg max-w-3xl mx-auto">
+    <p className="text-gray-500 max-w-3xl mx-auto">
       Become part of a powerful global alumni ecosystem that empowers your career,
       strengthens connections, and enables you to give back to the next generation.
     </p>
@@ -354,7 +355,6 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.1 }}
-        whileHover={{ y: -8 }}
         className="p-8 bg-white rounded-2xl border border-gray-200 hover:shadow-xl transition"
       >
 
@@ -403,7 +403,7 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
       Career & Alumni Opportunities
     </h2>
 
-    <p className="text-center text-gray-500 text-lg ">
+    <p className="text-center text-gray-500 ">
       SRM alumni benefit from a powerful global network, exclusive placement drives,
       startup collaborations, and academic opportunities across top organizations.
     </p>
@@ -476,7 +476,7 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
   {/* HEADER */}
   <div className="text-center max-w-2xl mx-auto mb-14">
     
-    <h2 className="text-4xl font-serif font-bold text-gray-800">
+    <h2 className="text-5xl font-serif font-bold text-gray-800">
       Alumni Directorate Team
     </h2>
 
@@ -561,7 +561,7 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
   <h2 className="text-5xl font-bold mb-6 font-serif">
     Success Stories
   </h2>
-  <p className="text-gray-500text-xl mb-14 max-w-2xl mx-auto">
+  <p className="text-gray-500text-xl mb-14 max-w-2xl mx-auto text-gray-500">
     Hear from alumni who transformed their careers through our network
   </p>
 
@@ -730,17 +730,30 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
     <div className="flex items-center gap-4">
       <FaEnvelope className="text-white/80" size={18} />
       <span className="text-sm font-medium">
-        alumni@srmist.edu.in
+        infodesk@srmist.edu.in
       </span>
     </div>
 
     {/* PHONE */}
-    <div className="flex items-center gap-4">
-      <FaPhoneAlt className="text-white/80" size={18} />
-      <span className="text-sm">
-        +91 98765 43210
-      </span>
-    </div>
+    <div className="flex flex-col gap-3">
+  {/* Number 1 */}
+  <div className="flex items-center gap-3">
+    <FaPhoneAlt className="text-white/80" size={16} />
+    <span className="text-sm">+91 44 27417000</span>
+  </div>
+
+  {/* Number 2 */}
+  <div className="flex items-center gap-3">
+    <FaPhoneAlt className="text-white/80" size={16} />
+    <span className="text-sm">+91 44 27417777</span>
+  </div>
+
+  {/* Number 3 */}
+  <div className="flex items-center gap-3">
+    <FaPhoneAlt className="text-white/80" size={16} />
+    <span className="text-sm">+91 80 69087000</span>
+  </div>
+</div>
 
   </div>
 
@@ -750,52 +763,86 @@ const targetDate = new Date("2027-01-26T09:00:00").getTime();
 
 </section>
 
+{/* Footer */}
+<footer className="bg-emerald-900 text-white py-12">
+      <div className="max-w-6xl mx-auto px-6">
+        
+        {/* TOP SECTION: Quick Links & Info */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10 text-center md:text-left">
+          
+          {/* Brand/About */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold border-b border-emerald-700 pb-2 inline-block">
+              SRM Alumni Portal
+            </h3>
+            <p className="text-emerald-100/70 text-sm leading-relaxed">
+              Connecting generations of SRMites. Stay updated with campus news, 
+              job opportunities, and global alumni meetups.
+            </p>
+          </div>
 
-{/* FOOTER */}
-<footer className="bg-emerald-900 text-white py-8">
+          {/* QUICK LINKS (Updated from your routes) */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-emerald-400">Quick Links</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm text-emerald-100/80">
+              <Link to="/dashboard" className="hover:text-white transition">Dashboard</Link>
+              <Link to="/directory" className="hover:text-white transition">Directory</Link>
+              <Link to="/jobs" className="hover:text-white transition">Job Board</Link>
+              <Link to="/events" className="hover:text-white transition">Events</Link>
+              <Link to="/news" className="hover:text-white transition">News</Link>
+              <Link to="/campaigns" className="hover:text-white transition">Campaigns</Link>
+            </div>
+          </div>
 
-  <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+          {/* NOTICES & SUPPORT */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-emerald-400">Support</h3>
+            <ul className="text-sm text-emerald-100/80 space-y-2">
+              <li><Link to="/notices" className="hover:text-white transition">Notices</Link></li>
+              <li><Link to="/elections" className="hover:text-white transition">Elections</Link></li>
+              <li><Link to="/edit-profile" className="hover:text-white transition">Account Settings</Link></li>
+            </ul>
+          </div>
+        </div>
 
-    {/* LEFT */}
-    <p className="text-sm">
-      © 2026 SRM Alumni Network. All rights reserved.
-    </p>
+        {/* DIVIDER */}
+        <div className="border-t border-emerald-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          
+          {/* LEFT: Copyright */}
+          <p className="text-sm text-emerald-200/60 font-medium">
+            © 2026 SRM Alumni Network. All rights reserved.
+          </p>
 
-    {/* RIGHT - SOCIAL ICONS */}
-    <div className="flex gap-4 text-lg">
-
-      <a 
-        href="https://www.facebook.com/SRMUniversityOfficial/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="hover:text-emerald-400 transition"
-      >
-        <FaFacebookF />
-      </a>
-
-      <a 
-        href="https://www.instagram.com/srmuniversityofficial/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="hover:text-emerald-400 transition"
-      >
-        <FaInstagram />
-      </a>
-
-      <a 
-        href="https://x.com/SRM_Univ" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="hover:text-emerald-400 transition"
-      >
-        <FaTwitter />
-      </a>
-
-    </div>
-
-  </div>
-
-</footer>
+          {/* RIGHT: Social Icons */}
+          <div className="flex gap-6 text-xl">
+            <a 
+              href="https://www.facebook.com/SRMUniversityOfficial/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-emerald-400 transition transform hover:scale-110"
+            >
+              <FaFacebookF />
+            </a>
+            <a 
+              href="https://www.instagram.com/srmuniversityofficial/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-emerald-400 transition transform hover:scale-110"
+            >
+              <FaInstagram />
+            </a>
+            <a 
+              href="https://x.com/SRM_Univ" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-emerald-400 transition transform hover:scale-110"
+            >
+              <FaTwitter />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
     </div>
   );
 }
