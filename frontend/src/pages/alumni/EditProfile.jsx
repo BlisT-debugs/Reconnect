@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
+import { 
+  User, GraduationCap, Briefcase, MapPin, 
+  Globe, Camera, Save, X, Mail 
+} from 'lucide-react';
 
 const EditProfile = () => {
     const navigate = useNavigate();
     
-    // Changed batchId, departmentId to simple strings!
     const [formData, setFormData] = useState({
         first_name: '', last_name: '', official_email: '', nickname: '', 
         phone: '', dob: '', blood_group: '', gender: '', about_me: '',
@@ -30,20 +33,16 @@ const EditProfile = () => {
                 
                 if (data) {
                     if (data.dob) data.dob = data.dob.split('T')[0];
-                    
-                    // Map the actual string names from the relational tables back into our form
                     const mappedData = {
                         ...data,
                         batch: data.batch?.name || '',
                         department: data.department?.name || '',
                         passing_year: data.passingYear?.name || ''
                     };
-
                     const sanitizedData = Object.fromEntries(
                         Object.entries(mappedData).map(([key, value]) => [key, value === null ? '' : value])
                     );
                     setFormData(sanitizedData);
-                    
                     if (sanitizedData.profile_pic) {
                         setImagePreview(`http://localhost:5000${sanitizedData.profile_pic}`);
                     }
@@ -105,102 +104,184 @@ const EditProfile = () => {
         }
     };
 
-    if (loading) return <p style={{ textAlign: 'center', marginTop: '50px', color: 'white' }}>Loading Profile Data...</p>;
+    if (loading) return (
+        <div className="flex h-screen items-center justify-center bg-gray-50 text-emerald-800 font-bold animate-pulse">
+            Loading Profile Data...
+        </div>
+    );
 
     return (
-        <div style={{ maxWidth: '900px', margin: '40px auto', padding: '30px', backgroundColor: '#1e1e2f', color: 'white', borderRadius: '8px', fontFamily: 'sans-serif' }}>
-            <h2 style={{ borderBottom: '2px solid #0056b3', paddingBottom: '10px', textAlign: 'center' }}>Complete Alumni Profile</h2>
+        <div className="p-8 max-w-5xl mx-auto font-sans">
             
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Header Area */}
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800 font-serif">Profile Settings</h1>
+                    <p className="text-gray-500 mt-1">Update your personal and professional information</p>
+                </div>
+                <div className="flex gap-3">
+                    <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 px-6 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all font-semibold shadow-sm">
+                        <X size={18} /> Cancel
+                    </button>
+                    <button onClick={handleSubmit} className="flex items-center gap-2 px-6 py-2 bg-emerald-700 text-white rounded-xl hover:bg-emerald-800 transition-all font-semibold shadow-md">
+                        <Save size={18} /> Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-8 pb-12">
                 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-                    <div style={{ 
-                        width: '150px', height: '150px', borderRadius: '50%', backgroundColor: '#2a2a3c', 
-                        border: '3px solid #0056b3', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'
-                    }}>
-                        {imagePreview ? (
-                            <img src={imagePreview} alt="Profile Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                            <span style={{ color: '#aaa' }}>No Photo</span>
-                        )}
+                {/* 🔹 PHOTO & BIO SECTION */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-10">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="relative group">
+                            <div className="w-40 h-40 rounded-full bg-emerald-50 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center">
+                                {imagePreview ? (
+                                    <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User size={60} className="text-emerald-200" />
+                                )}
+                            </div>
+                            <label className="absolute bottom-2 right-2 p-2 bg-emerald-600 text-white rounded-full shadow-lg cursor-pointer hover:bg-emerald-700 transition-all">
+                                <Camera size={20} />
+                                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                            </label>
+                        </div>
+                        <p className="text-xs text-gray-400">JPG, PNG or GIF. Max 2MB</p>
                     </div>
-                    <input type="file" accept="image/*" onChange={handleImageChange} style={{ color: '#fff', backgroundColor: '#2a2a3c', padding: '10px', borderRadius: '4px', cursor: 'pointer' }} />
-                </div>
-
-                <h3 style={headerStyle}>Personal Information</h3>
-                <div style={gridStyle}>
-                    <input type="text" name="first_name" placeholder="First Name *" value={formData.first_name} onChange={handleChange} required style={inputStyle} />
-                    <input type="text" name="last_name" placeholder="Last Name *" value={formData.last_name} onChange={handleChange} required style={inputStyle} />
-                    <input type="email" name="official_email" placeholder="Official Email" value={formData.official_email} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="nickname" placeholder="Nickname" value={formData.nickname} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} style={inputStyle} />
-                    <input type="date" name="dob" value={formData.dob} onChange={handleChange} style={inputStyle} />
                     
-                    <select name="gender" value={formData.gender} onChange={handleChange} style={inputStyle}>
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-
-                    {/* NEW: Blood Group Dropdown! */}
-                    <select name="blood_group" value={formData.blood_group} onChange={handleChange} style={inputStyle}>
-                        <option value="">Select Blood Group</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                    </select>
-                </div>
-                <textarea name="about_me" placeholder="About Me / Bio" value={formData.about_me} onChange={handleChange} style={{ ...inputStyle, minHeight: '80px', width: '100%' }} />
-
-                {/* NEW: Academic Text Fields (No more negative IDs!) */}
-                <h3 style={headerStyle}>Academic Details</h3>
-                <div style={gridStyle}>
-                    <input type="text" name="batch" placeholder="Batch (e.g. 2022-2026)" value={formData.batch} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="department" placeholder="Department (e.g. Computer Science)" value={formData.department} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="passing_year" placeholder="Passing Year (e.g. 2026)" value={formData.passing_year} onChange={handleChange} style={inputStyle} />
+                    <div className="flex-1 flex flex-col gap-4">
+                        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2 font-serif">
+                            <span className="p-2 bg-emerald-100 text-emerald-700 rounded-lg"><User size={20}/></span>
+                            Personal Information
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputField label="First Name" name="first_name" value={formData.first_name} onChange={handleChange} required />
+                            <InputField label="Last Name" name="last_name" value={formData.last_name} onChange={handleChange} required />
+                            <InputField label="Official Email" name="official_email" placeholder="email@srmist.edu.in" value={formData.official_email} onChange={handleChange} icon={<Mail size={16}/>}/>
+                            <InputField label="Nickname" name="nickname" value={formData.nickname} onChange={handleChange} />
+                        </div>
+                    </div>
                 </div>
 
-                <h3 style={headerStyle}>Professional Details</h3>
-                <div style={gridStyle}>
-                    <input type="text" name="company" placeholder="Current Company" value={formData.company} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="designation" placeholder="Designation" value={formData.designation} onChange={handleChange} style={inputStyle} />
+                {/* 🔹 DETAILS GRID */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    {/* Academic Section */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <SectionHeader icon={<GraduationCap size={20}/>} title="Academic Details" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputField label="Batch" name="batch" placeholder="2022-2026" value={formData.batch} onChange={handleChange} />
+                            <InputField label="Passing Year" name="passing_year" placeholder="2026" value={formData.passing_year} onChange={handleChange} />
+                            <div className="md:col-span-2">
+                                <InputField label="Department" name="department" placeholder="e.g. Computer Science" value={formData.department} onChange={handleChange} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Professional Section */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <SectionHeader icon={<Briefcase size={20}/>} title="Professional Experience" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <InputField label="Current Company" name="company" value={formData.company} onChange={handleChange} />
+                            <InputField label="Designation" name="designation" value={formData.designation} onChange={handleChange} />
+                            <div className="md:col-span-2">
+                                <InputField label="Phone" name="phone" value={formData.phone} onChange={handleChange} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Additional Details */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <SectionHeader icon={<Globe size={20}/>} title="Additional Info" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <SelectField label="Gender" name="gender" value={formData.gender} onChange={handleChange} options={['Male', 'Female', 'Other']} />
+                            <SelectField label="Blood Group" name="blood_group" value={formData.blood_group} onChange={handleChange} options={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']} />
+                            <div className="md:col-span-2">
+                                <InputField label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Location Info */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <SectionHeader icon={<MapPin size={20}/>} title="Location Details" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="md:col-span-2">
+                                <InputField label="City" name="city" value={formData.city} onChange={handleChange} />
+                            </div>
+                            <InputField label="ZIP" name="zip" value={formData.zip} onChange={handleChange} />
+                            <div className="md:col-span-3">
+                                <InputField label="State" name="state" value={formData.state} onChange={handleChange} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <h3 style={headerStyle}>Location Information</h3>
-                <div style={gridStyle}>
-                    <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="state" placeholder="State" value={formData.state} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="zip" placeholder="ZIP / Postal Code" value={formData.zip} onChange={handleChange} style={inputStyle} />
-                </div>
-                <textarea name="address" placeholder="Full Address" value={formData.address} onChange={handleChange} style={{ ...inputStyle, minHeight: '60px', width: '100%' }} />
-
-                <h3 style={headerStyle}>Social Media Profiles</h3>
-                <div style={gridStyle}>
-                    <input type="text" name="linkedin_url" placeholder="LinkedIn URL" value={formData.linkedin_url} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="github_url" placeholder="GitHub URL" value={formData.github_url} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="twitter_url" placeholder="Twitter URL" value={formData.twitter_url} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="instagram_url" placeholder="Instagram URL" value={formData.instagram_url} onChange={handleChange} style={inputStyle} />
-                    <input type="text" name="facebook_url" placeholder="Facebook URL" value={formData.facebook_url} onChange={handleChange} style={inputStyle} />
-                </div>
-
-                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                    <button type="submit" style={btnStyle}>Save All Profile Data</button>
-                    <button type="button" onClick={() => navigate('/dashboard')} style={{ ...btnStyle, backgroundColor: '#6c757d' }}>Cancel</button>
+                {/* 🔹 SOCIAL & BIO SECTION */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <SectionHeader icon={<Globe size={20}/>} title="Social Profiles & Bio" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <InputField label="LinkedIn" name="linkedin_url" value={formData.linkedin_url} onChange={handleChange} />
+                        <InputField label="GitHub" name="github_url" value={formData.github_url} onChange={handleChange} />
+                        <InputField label="Twitter/X" name="twitter_url" value={formData.twitter_url} onChange={handleChange} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600 ml-1">About Me / Bio</label>
+                        <textarea 
+                            name="about_me" 
+                            value={formData.about_me} 
+                            onChange={handleChange} 
+                            className="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:bg-white transition-all outline-none text-gray-700 min-h-[120px] resize-none"
+                            placeholder="Tell the alumni community about your journey..."
+                        />
+                    </div>
                 </div>
             </form>
         </div>
     );
 };
 
-const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' };
-const inputStyle = { padding: '12px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#2a2a3c', color: 'white', boxSizing: 'border-box' };
-const headerStyle = { marginTop: '20px', marginBottom: '10px', color: '#a0a0ff' };
-const btnStyle = { padding: '12px 30px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', minWidth: '150px' };
+/* 🔹 HELPER COMPONENTS 🔹 */
+
+const SectionHeader = ({ icon, title }) => (
+    <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">{icon}</div>
+        <h3 className="text-lg font-bold text-gray-800 font-serif">{title}</h3>
+    </div>
+);
+
+const InputField = ({ label, name, type = "text", value, onChange, placeholder, required = false, icon }) => (
+    <div className="flex flex-col gap-1.5 w-full">
+        <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">{label} {required && "*"}</label>
+        <div className="relative">
+            {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>}
+            <input 
+                type={type}
+                name={name}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                required={required}
+                className={`w-full ${icon ? 'pl-10' : 'px-4'} py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:bg-white transition-all outline-none text-gray-800 font-medium`}
+            />
+        </div>
+    </div>
+);
+
+const SelectField = ({ label, name, value, onChange, options }) => (
+    <div className="flex flex-col gap-1.5 w-full">
+        <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">{label}</label>
+        <select 
+            name={name}
+            value={value}
+            onChange={onChange}
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:bg-white transition-all outline-none text-gray-800 font-medium appearance-none"
+        >
+            <option value="">Select {label}</option>
+            {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+    </div>
+);
 
 export default EditProfile;

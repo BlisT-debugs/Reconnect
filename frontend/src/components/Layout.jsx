@@ -1,14 +1,18 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import API from '../services/api';
+import { 
+  LayoutDashboard, User, Users, MessageSquare, Briefcase, Calendar, 
+  Newspaper, Bell, Megaphone, Vote, ShieldAlert, AlertTriangle, LogOut, GraduationCap 
+} from 'lucide-react';
 
 const Layout = () => {
     const navigate = useNavigate();
-    const location = useLocation(); // Gets the current URL path
+    const location = useLocation(); 
     const [role, setRole] = useState('user');
 
+    // 🔹 TERI FUNCTIONALITY (No Changes)
     useEffect(() => {
-        // Fetch the user's role so we know whether to show the Admin button
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -27,62 +31,80 @@ const Layout = () => {
         navigate('/login');
     };
 
-    // A helper function to make the active link light up!
-    const linkStyle = (path) => ({
-        display: 'block',
-        padding: '12px 20px',
-        color: location.pathname === path ? '#fff' : '#aaa',
-        backgroundColor: location.pathname === path ? '#0056b3' : 'transparent',
-        textDecoration: 'none',
-        borderRadius: '4px',
-        marginBottom: '10px',
-        fontWeight: location.pathname === path ? 'bold' : 'normal',
-        transition: '0.2s ease-in-out'
-    });
-
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', fontFamily: 'sans-serif' }}>
+        <div className="flex min-h-screen bg-gray-50 font-sans">
             
-            {/* --- SIDEBAR --- */}
-            <div style={{ width: '250px', backgroundColor: '#1e1e2f', padding: '20px', borderRight: '1px solid #333', display: 'flex', flexDirection: 'column' }}>
-                <h2 style={{ color: '#007bff', textAlign: 'center', marginBottom: '40px', fontSize: '24px' }}>
-                    Alumni Portal
-                </h2>
+            {/* 🔹 FLOATING SIDEBAR */}
+            <aside className="fixed left-4 top-4 bottom-4 w-20 bg-emerald-900 rounded-3xl shadow-2xl z-50 flex flex-col items-center py-6 overflow-visible">
                 
-                {/* Navigation Links */}
-                <div style={{ flex: 1 }}>
-                    <Link to="/dashboard" style={linkStyle('/dashboard')}>🏠 Dashboard</Link>
-                    <Link to="/edit-profile" style={linkStyle('/edit-profile')}>👤 My Profile</Link>
-                    <Link to="/directory" style={linkStyle('/directory')}>👥 Directory</Link>
-                    <Link to="/chat" style={linkStyle('/chat')}>💬 Messenger</Link>
-                    <Link to="/jobs" style={linkStyle('/jobs')}>💼 Job Board</Link>
-                    <Link to="/events" style={linkStyle('/events')}>📅 Events</Link>
-                    <Link to="/news" style={linkStyle('/news')}>📰 News</Link>
-                    <Link to="/notices" style={linkStyle('/notices')}>📌 Notices</Link>
-                    <Link to="/campaigns" style={linkStyle('/campaigns')}>💰 Campaigns</Link>
-                    <Link to="/elections" style={linkStyle('/elections')}>🗳️ Elections</Link>
-                    
-                    {/* Only Admins see this link */}
-                    {role === 'admin' && (
-                        <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #444' }}>
-                            <Link to="/admin" style={linkStyle('/admin')}>🔒 Admin Panel</Link>
-                            <Link to="/moderation" style={linkStyle('/moderation')}>☢️ Moderation</Link>
-                        </div>
-                    )}
+                {/* Logo */}
+                <div className="flex items-center justify-center w-full mb-8 pb-4 border-b border-emerald-800/50">
+                    <GraduationCap className="text-emerald-400" size={32} />
                 </div>
 
-                {/* Logout Button sticks to the bottom */}
-                <button onClick={handleLogout} style={{ padding: '12px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', width: '100%' }}>
-                    🚪 Logout
-                </button>
-            </div>
+                {/* Navigation Links */}
+                <nav className="flex-1 w-full px-4 space-y-3">
+                    <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20}/>} label="Dashboard" currentPath={location.pathname} />
+                    <SidebarLink to="/edit-profile" icon={<User size={20}/>} label="My Profile" currentPath={location.pathname} />
+                    <SidebarLink to="/directory" icon={<Users size={20}/>} label="Directory" currentPath={location.pathname} />
+                    <SidebarLink to="/chat" icon={<MessageSquare size={20}/>} label="Messenger" currentPath={location.pathname} />
+                    <SidebarLink to="/jobs" icon={<Briefcase size={20}/>} label="Job Board" currentPath={location.pathname} />
+                    <SidebarLink to="/events" icon={<Calendar size={20}/>} label="Events" currentPath={location.pathname} />
+                    <SidebarLink to="/news" icon={<Newspaper size={20}/>} label="News" currentPath={location.pathname} />
+                    <SidebarLink to="/notices" icon={<Bell size={20}/>} label="Notices" currentPath={location.pathname} />
+                    <SidebarLink to="/campaigns" icon={<Megaphone size={20}/>} label="Campaigns" currentPath={location.pathname} />
+                    <SidebarLink to="/elections" icon={<Vote size={20}/>} label="Elections" currentPath={location.pathname} />
+                    
+                    {/* Admin Links */}
+                    {role === 'admin' && (
+                        <div className="mt-4 pt-4 border-t border-emerald-800/50 space-y-3">
+                            <SidebarLink to="/admin" icon={<ShieldAlert size={20}/>} label="Admin Panel" currentPath={location.pathname} isDanger />
+                            <SidebarLink to="/moderation" icon={<AlertTriangle size={20}/>} label="Moderation" currentPath={location.pathname} isDanger />
+                        </div>
+                    )}
+                </nav>
 
-            {/* --- MAIN CONTENT AREA --- */}
-            <div style={{ flex: 1, height: '100vh', overflowY: 'auto', backgroundColor: '#121212' }}>
-                {/* This <Outlet /> is magic. It renders whatever page you are currently on! */}
+                {/* Logout Button */}
+                <div className="w-full px-4 pt-4 border-t border-emerald-800/50 mt-auto">
+                    <div className="relative h-12 w-full z-10 hover:z-50">
+                        <button 
+                            onClick={handleLogout}
+                            className="group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden text-red-400 hover:bg-red-600 hover:text-white w-12 hover:w-40 hover:shadow-xl"
+                        >
+                            <div className="min-w-[24px] flex items-center justify-center"><LogOut size={20} /></div>
+                            <span className="ml-4 font-medium whitespace-nowrap transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                                Logout
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            {/* 🔹 MAIN CONTENT AREA */}
+            <main className="flex-1 ml-28 h-screen overflow-y-auto bg-gray-50 transition-all duration-300">
                 <Outlet /> 
-            </div>
+            </main>
             
+        </div>
+    );
+};
+
+/* 🔹 PILL HOVER COMPONENT 🔹 */
+const SidebarLink = ({ to, icon, label, currentPath, isDanger }) => {
+    const active = currentPath === to;
+    return (
+        <div className="relative h-12 w-full z-10 hover:z-50">
+            <Link 
+                to={to} 
+                className={`group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden
+                ${active ? 'bg-emerald-700 text-white w-12 hover:w-48 shadow-lg' : 'text-emerald-100/70 hover:bg-emerald-700 hover:text-white w-12 hover:w-48 hover:shadow-xl'}
+                ${isDanger ? 'text-red-400 hover:bg-red-600 hover:text-white' : ''}`}
+            >
+                <div className="min-w-[24px] flex items-center justify-center flex-shrink-0">{icon}</div>
+                <span className="ml-4 font-medium whitespace-nowrap transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                    {label}
+                </span>
+            </Link>
         </div>
     );
 };

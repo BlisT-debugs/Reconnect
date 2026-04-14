@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../../services/api';
+import { 
+  User, Users, Briefcase, Calendar, ShieldAlert, 
+  Award, LogOut 
+} from 'lucide-react';
 
 const Dashboard = () => {
+    // 🔹 TERI FUNCTIONALITY (No Changes Here)
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
@@ -11,12 +15,11 @@ const Dashboard = () => {
         const fetchProfile = async () => {
             const token = localStorage.getItem('token');
             if (!token) {
-                navigate('/register'); // Kick them out if no token
+                navigate('/register');
                 return;
             }
 
             try {
-                // Send the token in the headers!
                 const response = await API.get('/auth/me', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -36,52 +39,92 @@ const Dashboard = () => {
         navigate('/register');
     };
 
-    if (!userData) return <h3 style={{ textAlign: 'center', marginTop: '50px' }}>Loading...</h3>;
+    if (!userData) return (
+        <div className="flex h-screen items-center justify-center bg-gray-50 text-emerald-800 font-bold text-xl animate-pulse">
+            Loading Dashboard...
+        </div>
+    );
 
+    // 🔹 NAYA PREMIUM UI START
     return (
-        <div style={{ maxWidth: '800px', margin: '50px auto', padding: '20px', fontFamily: 'sans-serif' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1>Alumni Dashboard</h1>
-                <button onClick={handleLogout} style={{ padding: '8px 15px', backgroundColor: '#dc3545', color: 'white', border: 'none', cursor: 'pointer' }}>
+        <div className="p-8 max-w-7xl mx-auto font-sans">
+            
+            {/* Header Area */}
+            <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800 font-serif">Alumni Dashboard</h1>
+                    <p className="text-gray-500 mt-1">
+                        Welcome back, <span className="text-emerald-700 font-semibold">{userData.name}</span>!
+                    </p>
+                </div>
+                {/* Logout Button */}
+                <button 
+                    onClick={handleLogout} 
+                    className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl font-bold transition-colors"
+                >
+                    <LogOut size={18} />
                     Logout
                 </button>
             </div>
 
-            <Link to="/edit-profile">
-                <button style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}>
-                    Complete Your Profile
-                </button>
-            </Link>
-            {userData.role === 'admin' && (
-            <Link to="/admin">
-                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
-                    Admin Panel
-                </button>
-            </Link>
-        )}
-            <Link to="/directory">
-                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer' }}>
-                    View Alumni Directory
-                </button>
-            </Link>
-            <Link to="/jobs">
-                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#17a2b8', color: 'white', border: 'none', cursor: 'pointer' }}>
-                    Job Board
-                </button>
-            </Link>
-            <Link to="/events">
-                <button style={{ marginTop: '20px', marginLeft: '10px', padding: '10px 20px', backgroundColor: '#ffc107', color: '#000', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
-                    Campus Events
-                </button>
-            </Link>
-            <div style={{ padding: '20px', backgroundColor: '#f4f4f9', borderRadius: '8px', marginTop: '20px' }}>
-                <h2>Welcome back, {userData.name}!</h2>
-                <p><strong>Email:</strong> {userData.email}</p>
-                <p><strong>Role:</strong> {userData.role}</p>
-                <p><strong>Tenant Link:</strong> {userData.tenantId}</p>
+            {/* Quick Action Cards (Emerald Theme) */}
+            <h2 className="text-lg font-bold text-gray-700 mb-4 px-2 font-serif">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                
+                <ActionCard to="/edit-profile" icon={<User size={22}/>} title="Complete Profile" />
+                <ActionCard to="/directory" icon={<Users size={22}/>} title="View Directory" />
+                <ActionCard to="/jobs" icon={<Briefcase size={22}/>} title="Job Board" />
+                <ActionCard to="/events" icon={<Calendar size={22}/>} title="Campus Events" />
+
+                {/* Conditional Admin Panel Card */}
+                {userData.role === 'admin' && (
+                    <Link to="/admin" className="bg-red-600 text-white p-4 rounded-xl shadow-md hover:shadow-lg hover:bg-red-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
+                        <ShieldAlert size={22}/>
+                        <span className="font-semibold">Admin Panel</span>
+                    </Link>
+                )}
             </div>
+
+            {/* User Details Area */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl">
+                <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700">
+                        <Award size={32} />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800 font-serif">Account Information</h2>
+                        <p className="text-sm text-gray-500">Your current portal details</p>
+                    </div>
+                </div>
+                
+                <div className="space-y-4">
+                    <InfoRow label="Full Name" value={userData.name} />
+                    <InfoRow label="Email Address" value={userData.email} />
+                    <InfoRow label="Role Type" value={userData.role.toUpperCase()} />
+                    <InfoRow label="Tenant Link" value={userData.tenantId} />
+                </div>
+            </div>
+
         </div>
     );
 };
 
 export default Dashboard;
+
+/* 🔹 UI HELPER COMPONENTS 🔹 */
+
+// Emerald Action Card
+const ActionCard = ({ to, icon, title }) => (
+    <Link to={to} className="bg-emerald-700 text-white p-4 rounded-xl shadow-md hover:shadow-lg hover:bg-emerald-800 hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
+        {icon}
+        <span className="font-medium font-serif">{title}</span>
+    </Link>
+);
+
+// Row for Details
+const InfoRow = ({ label, value }) => (
+    <div className="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
+        <span className="text-gray-500 text-sm font-medium">{label}</span>
+        <span className="text-gray-800 font-semibold text-sm">{value || 'N/A'}</span>
+    </div>
+);

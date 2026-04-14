@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
+import { Search, MapPin, Briefcase, GraduationCap, ArrowLeft, Users } from 'lucide-react';
 
 const Directory = () => {
     const navigate = useNavigate();
@@ -8,6 +9,7 @@ const Directory = () => {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // 🔹 TERI FUNCTIONALITY (No Changes)
     useEffect(() => {
         const fetchDirectory = async () => {
             try {
@@ -25,7 +27,6 @@ const Directory = () => {
         fetchDirectory();
     }, []);
 
-    // Filter the list based on the search bar
     const filteredAlumni = alumniList.filter(alumnus => 
         alumnus.first_name.toLowerCase().includes(search.toLowerCase()) || 
         alumnus.last_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -33,57 +34,118 @@ const Directory = () => {
         (alumnus.department && alumnus.department.name.toLowerCase().includes(search.toLowerCase()))
     );
 
-    if (loading) return <p style={{ textAlign: 'center', marginTop: '50px', color: 'white' }}>Loading Directory...</p>;
+    if (loading) return (
+        <div className="flex h-screen items-center justify-center bg-gray-50 text-emerald-800 font-bold animate-pulse">
+            Loading Global Directory...
+        </div>
+    );
 
     return (
-        <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
+        <div className="p-8 max-w-7xl mx-auto font-sans">
             
             {/* Header & Controls */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ color: '#007bff' }}>Alumni Directory</h1>
-                <button onClick={() => navigate('/dashboard')} style={{ padding: '8px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                    Back to Dashboard
+            <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
+                        <Users size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-800 font-serif">Alumni Directory</h1>
+                        <p className="text-gray-500 text-sm">Connect with {alumniList.length}+ SRMites across the globe</p>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => navigate('/dashboard')} 
+                    className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-xl font-bold transition-all shadow-sm"
+                >
+                    <ArrowLeft size={18} /> Back
                 </button>
             </div>
 
-            {/* Search Bar */}
-            <input 
-                type="text" 
-                placeholder="Search by Name, Company, or Department..." 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ width: '100%', padding: '15px', marginBottom: '30px', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#2a2a3c', color: 'white', fontSize: '16px' }}
-            />
+            {/* Modern Search Bar */}
+            <div className="relative mb-10 group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={20} />
+                <input 
+                    type="text" 
+                    placeholder="Search by Name, Company, or Department (e.g. CSE, Google, Chennai)..." 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-4 focus:ring-emerald-100 focus:border-emerald-200 transition-all outline-none text-gray-700 text-lg"
+                />
+            </div>
 
             {/* Grid of Alumni Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAlumni.map((alumnus) => (
-                    <div key={alumnus.id} style={{ backgroundColor: '#1e1e2f', padding: '20px', borderRadius: '8px', border: '1px solid #333', display: 'flex', gap: '15px', alignItems: 'center' }}>
-                        
-                        {/* Profile Picture */}
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #0056b3', flexShrink: 0 }}>
-                            {alumnus.profile_pic ? (
-                                <img src={`http://localhost:5000${alumnus.profile_pic}`} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <div style={{ width: '100%', height: '100%', backgroundColor: '#2a2a3c', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>No Pic</div>
-                            )}
+                    <div 
+                        key={alumnus.id} 
+                        className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col relative overflow-hidden"
+                    >
+                        {/* Subtle Background Decoration */}
+                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+
+                        <div className="flex gap-5 items-start relative z-10">
+                            {/* Profile Picture */}
+                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-emerald-50 shadow-inner flex-shrink-0 group-hover:border-emerald-500 transition-colors">
+                                {alumnus.profile_pic ? (
+                                    <img 
+                                        src={`http://localhost:5000${alumnus.profile_pic}`} 
+                                        alt={alumnus.first_name} 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-400">
+                                        <User size={24} />
+                                        <span className="text-[10px] font-bold uppercase mt-1">No Pic</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Text Info */}
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-xl font-bold text-gray-800 truncate">
+                                    {alumnus.first_name} {alumnus.last_name}
+                                </h3>
+                                <div className="flex items-center gap-1.5 text-emerald-600 font-semibold text-sm mt-1">
+                                    <Briefcase size={14} />
+                                    <span className="truncate">{alumnus.designation || 'Alumnus'}</span>
+                                </div>
+                                <div className="text-gray-400 text-sm mt-1 flex items-center gap-1">
+                                    <MapPin size={12} />
+                                    <span className="truncate">{alumnus.company || 'Private Sector'}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Text Info */}
-                        <div style={{ flex: 1, overflow: 'hidden' }}>
-                            <h3 style={{ margin: '0 0 5px 0', fontSize: '18px' }}>{alumnus.first_name} {alumnus.last_name}</h3>
-                            <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#aaa' }}>{alumnus.designation || 'Alumnus'} at {alumnus.company || 'Unknown'}</p>
-                            <p style={{ margin: '0', fontSize: '13px', color: '#007bff' }}>{alumnus.department ? alumnus.department.name : 'No Dept'} • Batch of {alumnus.passingYear ? alumnus.passingYear.name : '?'}</p>
+                        {/* Academic Footer Tag */}
+                        <div className="mt-6 pt-4 border-t border-gray-50 flex justify-between items-center relative z-10">
+                            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-tight">
+                                <GraduationCap size={16} className="text-emerald-500" />
+                                <span>{alumnus.department ? alumnus.department.name : 'SRM KTR'}</span>
+                            </div>
+                            <span className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg text-[11px] font-black">
+                                CLASS OF '{alumnus.passingYear ? alumnus.passingYear.name.slice(-2) : '??'}'
+                            </span>
                         </div>
-
                     </div>
                 ))}
             </div>
 
-            {filteredAlumni.length === 0 && <p style={{ textAlign: 'center', color: '#aaa', marginTop: '40px' }}>No alumni found matching your search.</p>}
-
+            {/* Empty State */}
+            {filteredAlumni.length === 0 && (
+                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200 mt-10">
+                    <Search size={48} className="mx-auto text-gray-200 mb-4" />
+                    <h3 className="text-xl font-bold text-gray-400 ">No Alumni Found</h3>
+                    <p className="text-gray-400 text-sm" style={{ fontStyle: 'italic' }}>
+                        Try searching with a different name, batch, or company.
+                    </p>
+                </div>
+            )}
         </div>
     );
 };
+
+// Simple Icon fallback helper
+const User = ({ size }) => <Users size={size} />;
 
 export default Directory;
