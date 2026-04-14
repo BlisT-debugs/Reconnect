@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import srmBg from "../../assets/srm2.jpg";
 import { useEffect, useState } from "react";
 import { Users, Calendar, Briefcase, Globe, MessageSquare, Megaphone, Vote, Mail, Phone, MapPin } from 'lucide-react';
-import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 
 import { motion } from 'framer-motion';
 import logo from "../../assets/srm_logo.png";
@@ -12,27 +12,33 @@ export default function Landing() {
   const [showNavbar, setShowNavbar] = useState(false);
   const navbarBg = useTransform(scrollY, [0, 100], ["rgba(255,255,255,0.3)", "rgba(255,255,255,0.9)"]);
   const stats = [
-  { label: "Active Alumni", value: "50,000+", icon: Users },
-  { label: "Annual Events", value: "120+", icon: Calendar },
-  { label: "Jobs Posted", value: "2,500+", icon: Briefcase },
-  { label: "Countries", value: "85+", icon: Globe },
+  { label: "Active Alumni", value: "1,75,000+", icon: Users },
+  { label: "Annual Events", value: "500+", icon: Calendar },
+  { label: "Jobs Posted", value: "9,700+", icon: Briefcase },
+  { label: "Countries", value: "100+", icon: Globe },
 ];
 
 const testimonials = [
   {
-    img: "https://randomuser.me/api/portraits/men/32.jpg",
-    name: "Rohit Patil",
-    feedback: "This network helped me land my dream job and grow professionally.",
+    name: "Ankit Sharma",
+    role: "Software Engineer @ Google",
+    batch: "Class of 2019",
+    feedback: "SRM KTR wasn't just about the degree; it was the ecosystem. The semester abroad program and the placement cell gave me the global exposure I needed to land my role at Google.",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop",
   },
   {
-    img: "https://randomuser.me/api/portraits/women/44.jpg",
-    name: "Priya Mehta",
-    feedback: "Amazing community! I found mentors who guided me at every step.",
+    name: "Dr. Sneha Iyer",
+    role: "Senior Scientist",
+    batch: "Class of 2017",
+    feedback: "The biotechnology labs and the faculty mentorship at SRM were pivotal. They didn't just teach us theory; they encouraged us to innovate and solve real-world problems.",
+    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&fit=crop",
   },
   {
-    img: "https://randomuser.me/api/portraits/men/65.jpg",
-    name: "Arjun Verma",
-    feedback: "Great platform to reconnect and explore new opportunities.",
+    name: "Varun Kapoor",
+    role: "Founder, Tech-Start",
+    batch: "Class of 2021",
+    feedback: "From Milan to Aaruush, the diversity at SRM KTR shaped my personality. It gave me the confidence to start my venture. Reconnecting with alumni has opened so many doors.",
+    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&h=200&fit=crop",
   },
 ];
 
@@ -68,7 +74,7 @@ const features = [
     icon: <Vote size={28} />,
   },
 ];
-const targetDate = new Date("2026-06-01T00:00:00").getTime();
+const targetDate = new Date("2027-01-26T09:00:00").getTime();
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -76,21 +82,29 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
     minutes: 0,
     seconds: 0,
   });
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const distance = targetDate - now;
 
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((distance / 1000 / 60) % 60),
-        seconds: Math.floor((distance / 1000) % 60),
-      });
+      // 2. Check agar countdown khatam ho gaya ho
+      if (distance < 0) {
+        clearInterval(interval);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        });
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [targetDate]);
+
   useEffect(() => {
   const handleScroll = () => {
     if (window.scrollY > 500) {
@@ -127,7 +141,7 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
         <a
           key={i}
           href={item.link}
-          className="px-4 py-2 rounded-full text-gray-700 hover:bg-emerald-600 hover:text-white transition text-sm font-medium"
+          className="px-4 py-2 rounded-full text-gray-700 hover:bg-emerald-700 hover:text-white transition text-sm font-medium"
         >
           {item.name}
         </a>
@@ -138,18 +152,29 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
 
   {/* 🔹 RIGHT CORNER SIGN IN */}
   <div className="absolute right-6 top-0">
-    <Link to="/login">
-      <button className="bg-emerald-700 text-white px-5 py-2 rounded-full shadow-md hover:bg-emerald-800 transition">
-        Sign In
-      </button>
-    </Link>
-  </div>
+  <Link to="/login">
+    
+    <button
+      className={`px-5 py-2 rounded-full shadow-md transition-all duration-300
+        ${
+          showNavbar
+            ? "bg-emerald-700 text-white hover:bg-emerald-800"
+            : "border-white/30 text-black rounded-full shadow-md hover:bg-white/30 transition bg-white/80 backdrop-blur-lg border border-gray-200"
+
+        }
+      `}
+    >
+      Sign In
+    </button>
+
+  </Link>
+</div>
 
 </motion.nav>
 
       {/* Hero Section */}
 <section
-  className="min-h-screen flex items-center px-10 pt-24 bg-cover bg-center relative"
+  className="min-h-screen flex items-center px-10 pt-24 bg-cover bg-center relative rounded-b-3xl overflow-hidden"
   style={{ backgroundImage: `url(${srmBg})` }}
 >
     <div className="absolute top-0 left-0 w-full flex justify-between items-center px-10 py-6 z-20">
@@ -176,7 +201,7 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
             initial={{ y: 120, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
-            className=" text-7xl font-bold leading-tight drop-shadow-[4px_6px_10px_rgba(0,0,0,0.6)]"
+            className=" text-7xl font-bold leading-tight font-serif drop-shadow-[4px_6px_10px_rgba(0,0,0,0.6)]"
           >
             Reconnect, <br /> Grow, and <br /> Succeed
           </motion.h1>
@@ -202,14 +227,15 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
 
   {/* JOIN NOW */}
   <Link to="/register">
-    <button className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-6 py-3 rounded-full shadow-md hover:bg-white/30 transition">
+    <button className="border-white/30 text-black px-6 py-3 rounded-full shadow-md hover:bg-white/30 transition bg-white/80 backdrop-blur-lg border border-gray-200">
+
       Join Now
     </button>
   </Link>
 
   {/* EXPLORE */}
   <a href="#events">
-    <button className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-6 py-3 rounded-full shadow-md hover:bg-white/30 transition">
+    <button className="border-white/30 text-black px-6 py-3 rounded-full shadow-md hover:bg-white/30 transition bg-white/80 backdrop-blur-lg border border-gray-200">
       Explore Network
     </button>
   </a>
@@ -217,10 +243,10 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
         </div>
 
 
-      </section>
+</section>
 
       {/* Stats with stagger animation */}
-      <section className="py-16 bg-white text-center grid grid-cols-2 md:grid-cols-4 gap-8 px-4">
+<section className="py-16 bg-white text-center grid grid-cols-2 md:grid-cols-4 gap-8 px-4">
       {stats.map((item, i) => (
         <motion.div
           key={i}
@@ -241,10 +267,10 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
           </div>
         </motion.div>
       ))}
-    </section>
+</section>
 
-      {/* Featured Event */}
-       <section id="events" className="py-20 bg-white text-center">
+{/* Featured Event */}
+<section id="events" className="py-20 bg-white text-center">
 
   {/* Outer container */}
   <div className="max-w-5xl mx-auto">
@@ -256,7 +282,7 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
       <motion.h2
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        className="text-4xl md:text-5xl font-bold mb-6 text-white"
+        className="text-4xl md:text-5xl font-bold mb-6 font-serif text-white"
       >
         Annual Alumni Meetup
       </motion.h2>
@@ -267,28 +293,27 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
       </p>
 
       {/* 🔥 TIMER */}
-      <div className="flex justify-center gap-6 mb-10 flex-wrap">
-        
-        {[
-          { label: "Days", value: timeLeft.days },
-          { label: "Hours", value: timeLeft.hours },
-          { label: "Minutes", value: timeLeft.minutes },
-          { label: "Seconds", value: timeLeft.seconds },
-        ].map((item, index) => (
-          <div
-            key={index}
-            className="bg-emerald-600/80 backdrop-blur-md px-8 py-6 rounded-2xl shadow-md min-w-[110px]"
-          >
-            <h3 className="text-4xl font-bold text-white">
-              {item.value.toString().padStart(2, "0")}
-            </h3>
-            <p className="text-emerald-200 mt-2 text-sm">
-              {item.label}
-            </p>
-          </div>
-        ))}
-
-      </div>
+     <div className="flex justify-center gap-6 mb-10 flex-wrap">
+  {[
+    { label: "Days", value: timeLeft?.days ?? 0 },
+    { label: "Hours", value: timeLeft?.hours ?? 0 },
+    { label: "Minutes", value: timeLeft?.minutes ?? 0 },
+    { label: "Seconds", value: timeLeft?.seconds ?? 0 },
+  ].map((item, index) => (
+    <div
+      key={index}
+      className="bg-emerald-600/80 backdrop-blur-md px-8 py-6 rounded-2xl shadow-lg min-w-[110px] flex flex-col items-center justify-center border border-white/10"
+    >
+      <h3 className="text-4xl font-bold text-white tabular-nums">
+        {/* String conversion se pehle safety check aur 0 padding */}
+        {String(item.value).padStart(2, "0")}
+      </h3>
+      <p className="text-emerald-100/80 mt-2 text-xs uppercase tracking-widest font-medium">
+        {item.label}
+      </p>
+    </div>
+  ))}
+</div>
 
       {/* Button */}
       <Link to="/events">
@@ -303,74 +328,240 @@ const targetDate = new Date("2026-06-01T00:00:00").getTime();
 
 </section>
 
-      {/* Why Join */}
-      <section className="py-20 px-10 bg-white">
-  <h2 className="text-5xl font-bold text-center mb-14">
-    Why Join Our Network?
-  </h2>
+<section className="py-20 px-6 md:px-10 bg-white">
 
-  <div className="grid md:grid-cols-3 gap-10">
+  {/* 🔹 HEADER */}
+  <div className="max-w-5xl mx-auto text-center mb-14">
+    
+    <h2 className="text-5xl font-bold font-playfair text-gray-800 mb-4 font-serif">
+      Why Join the SRM Alumni Network?
+    </h2>
+
+    <p className="text-gray-500 text-lg max-w-3xl mx-auto">
+      Become part of a powerful global alumni ecosystem that empowers your career,
+      strengthens connections, and enables you to give back to the next generation.
+    </p>
+
+  </div>
+
+  {/* 🔹 GRID */}
+  <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
     {features.map((item, i) => (
+
       <motion.div
         key={i}
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.1 }}
-        whileHover={{ y: -10 }}
+        whileHover={{ y: -8 }}
         className="p-8 bg-white rounded-2xl border border-gray-200 hover:shadow-xl transition"
       >
-        {/* Icon */}
+
+        {/* 🔹 ICON */}
         <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mb-5">
           {item.icon}
         </div>
 
-        {/* Title */}
-        <h3 className="font-semibold text-xl mb-2">
+        {/* 🔹 TITLE */}
+        <h3 className="font-semibold text-xl text-gray-800 mb-2">
           {item.title}
         </h3>
 
-        {/* Desc */}
-        <p className="text-gray-500">
+        {/* 🔹 DESC */}
+        <p className="text-gray-500 text-sm">
           {item.desc}
         </p>
+
       </motion.div>
+
     ))}
+
   </div>
+
+  {/* 🔹 CTA */}
+  <div className="text-center mt-14">
+    <p className="text-gray-600 mb-4">
+      Ready to stay connected and grow with SRM?
+    </p>
+
+    <Link to="/register">
+      <button className="bg-emerald-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-emerald-800 hover:scale-105 transition">
+        Join the Alumni Network →
+      </button>
+    </Link>
+  </div>
+
 </section>
 
-      {/* Jobs */}
-      <section id="jobs" className="py-20 bg-gray-50 px-10">
-        <h2 className="text-5xl font-bold text-left mb-6 ml-4">Job Opportunities</h2>
-        <p className="text-gray-500 text-xl text-left mb-10 ml-4">
-Exclusive positions shared by our alumni network  </p>
-        <div className="grid md:grid-cols-2 gap-6">
-          {[1, 2, 3, 4].map((job) => (
-            <motion.div
-              key={job}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="p-6 bg-white rounded-xl shadow"
-            >
-              <h3 className="font-semibold text-2xl">Software Engineer</h3>
-              <p className="text-gray-500">Chennai, India</p>
-              <Link to="/jobs">
-  <button className="mt-3 px-5 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-700 hover:scale-105 transition">
-    Apply Now →
-  </button>
-</Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+<section id="jobs" className="py-20 bg-gray-50 px-6 md:px-10">
 
-      {/* Testimonials */}
-      <section className="py-20 px-10 bg-white text-center">
+  {/* 🔹 HEADER */}
+  <div className="max-w-5xl mx-auto mb-12">
+    
+    <h2 className="text-center text-5xl font-bold font-serif text-gray-800 mb-4">
+      Career & Alumni Opportunities
+    </h2>
+
+    <p className="text-center text-gray-500 text-lg ">
+      SRM alumni benefit from a powerful global network, exclusive placement drives,
+      startup collaborations, and academic opportunities across top organizations.
+    </p>
+
+  </div>
+
+  {/* 🔹 GRID */}
+  <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+
+    {[
+      {
+        title: "Targeted Placement Drives",
+        desc: "Access exclusive job listings and placement support through the SRM Career Centre.",
+      },
+      {
+        title: "Industry Roles",
+        desc: "Opportunities in top companies like Amazon, Deloitte, IBM, and Hyundai across tech and management.",
+      },
+      {
+        title: "Startup Ecosystem",
+        desc: "Collaborate with 40+ startups on campus and contribute to innovative ventures.",
+      },
+      {
+        title: "Academic Positions",
+        desc: "Serve as visiting faculty or Professor of Practice leveraging your industry experience.",
+      },
+      {
+        title: "Global Networking",
+        desc: "Connect through 30+ international and 25+ Indian alumni chapters for referrals and growth.",
+      },
+      {
+        title: "Career Advancement",
+        desc: "Explore roles like Academic Counselor, Technical Assistant, and Corporate Executive via SRM job boards.",
+      },
+    ].map((item, i) => (
+
+     <div
+        key={i}
+        className="p-6 rounded-xl transition hover:shadow-md"
+      >
+
+        <h3 className="font-semibold text-xl text-gray-800 mb-2">
+          {item.title}
+        </h3>
+
+        <p className="text-gray-500 text-sm">
+          {item.desc}
+        </p>
+
+      </div>
+
+    ))}
+
+  </div>
+
+  {/* 🔹 CTA BUTTON */}
+  <div className="text-center mt-12">
+    <Link to="/jobs">
+      <button className="bg-emerald-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-emerald-800 hover:scale-105 transition">
+        Explore Job Listings →
+      </button>
+    </Link>
+  </div>
+
+</section>
+ 
+{/* Alumni Directorate Team */}
+<section className="py-20 px-6 bg-white">
+
+  {/* HEADER */}
+  <div className="text-center max-w-2xl mx-auto mb-14">
+    
+    <h2 className="text-4xl font-serif font-bold text-gray-800">
+      Alumni Directorate Team
+    </h2>
+
+    <div className="w-16 h-1 bg-emerald-700 mx-auto mt-3 rounded-full"></div>
+
+    <p className="text-gray-500 mt-4">
+      Meet the dedicated team behind the SRM Alumni Network, working to build meaningful connections and opportunities.
+    </p>
+
+  </div>
+
+  {/* GRID */}
+  <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+
+    {[
+      {
+        role: "Assistant Director",
+        name: "Mrs. Radha Ravindran",
+        email: "asstdirector.alumni@srmist.edu.in"
+      },
+      {
+        role: "Accountant",
+        name: "Mr. Jayaganesh",
+        email: "accounts.alumni@srmist.edu.in",
+      },
+      {
+        role: "Senior Assistant",
+        name: "Mr. Sundar Raj",
+        email: "sra.alumni@srmist.edu.in"
+      },
+      {
+        role: "Coordinator",
+        name: "Mr. Azarudeen",
+        email: "coordinator.alumni@srmist.edu.in"
+      },
+      {
+        role: "Networking & Relations Officer",
+        name: "Mr. Sathish R",
+        email: "pr.alumni@srmist.edu.in"
+      }
+    ].map((member, i) => (
+
+      <div
+        key={i}
+        className="p-6 rounded-xl transition hover:shadow-md"
+      >
+
+        {/* ROLE */}
+        <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">
+          {member.role}
+        </p>
+
+        {/* NAME */}
+        <h3 className="text-2xl font-serif font-semibold text-gray-800 mb-3">
+          {member.name}
+        </h3>
+
+        {/* EMAIL */}
+        <a
+          href={`mailto:${member.email}`}
+          className={`text-sm ${
+            member.highlight
+              ? "text-yellow-500 font-medium"
+              : "text-gray-600 hover:text-emerald-600"
+          } transition`}
+        >
+          {member.email}
+        </a>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</section>
+
+{/* Testimonials */}
+<section className="py-20 px-10 bg-white text-center">
   
   {/* Heading */}
-  <h2 className="text-5xl font-bold mb-6">
+  <h2 className="text-5xl font-bold mb-6 font-serif">
     Success Stories
   </h2>
-  <p className="text-gray-500 text-xl mb-14 max-w-2xl mx-auto">
+  <p className="text-gray-500text-xl mb-14 max-w-2xl mx-auto">
     Hear from alumni who transformed their careers through our network
   </p>
 
@@ -409,14 +600,12 @@ Exclusive positions shared by our alumni network  </p>
 
 </section>
 
-
+{/* News & Updates */}
 <section id="news" className="py-20 px-10 bg-gray-50">
-
   {/* Top Heading Row */}
   <div className="flex justify-between items-center mb-12 flex-wrap gap-4">
-    
     <div>
-      <h2 className="text-5xl font-bold text-gray-900">News & Updates</h2>
+      <h2 className="text-5xl font-bold text-gray-900 font-serif">News & Updates</h2>
       <p className="text-gray-500 mt-2">
         Stay connected with the latest from our alumni community
       </p>
@@ -427,69 +616,71 @@ Exclusive positions shared by our alumni network  </p>
         View All News →
       </button>
     </Link>
-
   </div>
 
   {/* News Cards */}
   <div className="grid md:grid-cols-3 gap-8">
-
     {[
       {
-        img: "https://images.unsplash.com/photo-1556761175-b413da4baf72",
+        img: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2070", // Corporate/Startup vibe for EcoDrive
         tag: "Achievement",
-        date: "April 8, 2026",
-        title: "SRM Alumni Make It to Forbes 30 Under 30",
+        date: "April 10, 2026",
+        title: "SRM Alumnus Startup 'EcoDrive' Secures $50M Series B Funding",
       },
       {
-        img: "https://images.unsplash.com/photo-1515169067868-5387ec356754",
-        tag: "Event",
-        date: "March 25, 2026",
-        title: "Annual Tech Summit: Shaping the Future",
+// Isko replace kar de second card (Healthcare Summit) wali image link se:
+        img: "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2070",        tag: "Event",
+        date: "March 28, 2026",
+        title: "Successful Wrap: Global Alumni Healthcare Summit 2026",
       },
       {
-        img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
+        img: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070", // Campus/Students vibe for Mentorship
         tag: "Program",
-        date: "March 15, 2026",
-        title: "Global Mentorship Program Launch",
+        date: "March 12, 2026",
+        title: "Launch of 'SRM NexGen' Mentorship Phase 4",
       },
     ].map((news, i) => (
-
       <motion.div
         key={i}
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.1 }}
         whileHover={{ y: -6 }}
-        className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
+        className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition flex flex-col h-full"
       >
-
         {/* Image */}
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <img
             src={news.img}
-            alt="news"
-            className="w-full h-52 object-cover transition duration-500 group-hover:scale-105"          />
-
+            alt={news.tag}
+            className="w-full h-52 object-cover transition duration-500 group-hover:scale-110"
+          />
           {/* Tag */}
-          <span className="absolute top-3 left-3 bg-white text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full shadow">
+          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-emerald-700 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full shadow-sm">
             {news.tag}
           </span>
         </div>
 
         {/* Content */}
-        <div className="p-5 text-left">
-          <p className="text-gray-400 text-sm mb-2">{news.date}</p>
-          <h3 className="text-lg font-semibold text-gray-800">
+        <div className="p-6 text-left flex-grow">
+          <p className="text-gray-400 text-xs font-medium mb-2 uppercase tracking-wide">
+            {news.date}
+          </p>
+          <h3 className="text-xl font-bold text-gray-800 leading-tight group-hover:text-emerald-700 transition-colors">
             {news.title}
           </h3>
+          <p className="text-gray-500 mt-3 text-sm line-clamp-2">
+            Click to read more about this recent update from our global SRM network.
+          </p>
         </div>
-
+        
+        {/* Bottom Bar (Visual polish) */}
+        <div className="px-6 pb-6 mt-auto">
+          <div className="w-full h-[1px] bg-gray-100 group-hover:bg-emerald-100 transition-colors"></div>
+        </div>
       </motion.div>
-
     ))}
-
   </div>
-
 </section>
 
       {/* CTA */}
@@ -499,7 +690,7 @@ Exclusive positions shared by our alumni network  </p>
 
     {/* 🔹 LEFT SIDE (OLD CTA) */}
     <div>
-      <h2 className="text-3xl md:text-4xl font-bold">
+      <h2 className="text-3xl md:text-4xl font-bold font-serif">
         Still connected to SRM?
       </h2>
       <p className="mt-3 text-emerald-100">
@@ -513,32 +704,42 @@ Exclusive positions shared by our alumni network  </p>
       </Link>
     </div>
 
-    {/* 🔹 RIGHT SIDE (CONTACT INFO) */}
-    <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-  
-  <h3 className="text-2xl font-semibold mb-4">
+   <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/20 shadow-xl hover:shadow-2xl transition-all">
+
+  {/* Heading */}
+  <h3 className="text-2xl font-semibold mb-6 text-white">
     Contact Us
   </h3>
 
-  <div className="space-y-3 text-emerald-100">
+  {/* Content */}
+  <div className="space-y-5 text-emerald-100">
 
-    <div className="flex items-start gap-3">
-      <MapPin size={18} className="mt-1" />
-      <div>
-        <p>SRM Institute of Science and Technology</p>
+    {/* LOCATION */}
+    <div className="flex items-start gap-4">
+      <FaMapMarkerAlt className="mt-1 text-white/80" size={18} />
+      <div className="text-sm leading-relaxed">
+        <p className="font-medium text-white">
+          SRM Institute of Science and Technology
+        </p>
         <p>Kattankulathur, Chennai - 603203</p>
         <p>Tamil Nadu, India</p>
       </div>
     </div>
 
-    <div className="flex items-center gap-3 mt-3">
-      <Mail size={18} />
-      <span className="font-medium">alumni@srmist.edu.in</span>
+    {/* EMAIL */}
+    <div className="flex items-center gap-4">
+      <FaEnvelope className="text-white/80" size={18} />
+      <span className="text-sm font-medium">
+        alumni@srmist.edu.in
+      </span>
     </div>
 
-    <div className="flex items-center gap-3">
-      <Phone size={18} />
-      <span>+91 98765 43210</span>
+    {/* PHONE */}
+    <div className="flex items-center gap-4">
+      <FaPhoneAlt className="text-white/80" size={18} />
+      <span className="text-sm">
+        +91 98765 43210
+      </span>
     </div>
 
   </div>
