@@ -54,6 +54,7 @@ const Layout = () => {
                     <Link to="/dashboard" style={linkStyle('/dashboard')}>🏠 Dashboard</Link>
                     <Link to="/edit-profile" style={linkStyle('/edit-profile')}>👤 My Profile</Link>
                     <Link to="/directory" style={linkStyle('/directory')}>👥 Directory</Link>
+                    <Link to="/chat" style={linkStyle('/chat')}>💬 Messenger</Link>
                     <Link to="/jobs" style={linkStyle('/jobs')}>💼 Job Board</Link>
                     <Link to="/events" style={linkStyle('/events')}>📅 Events</Link>
                     <Link to="/news" style={linkStyle('/news')}>📰 News</Link>
