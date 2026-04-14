@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import API from '../services/api';
 import { 
   LayoutDashboard, User, Users, MessageSquare, Briefcase, Calendar, 
-  Newspaper, Bell, Megaphone, Vote, ShieldAlert, AlertTriangle, LogOut, GraduationCap 
+  Newspaper, Bell, Megaphone, Vote, ShieldAlert, AlertTriangle, LogOut, GraduationCap, UserCheck 
 } from 'lucide-react';
 
 const Layout = () => {
@@ -54,7 +54,8 @@ const Layout = () => {
                     <SidebarLink to="/notices" icon={<Bell size={20}/>} label="Notices" currentPath={location.pathname} />
                     <SidebarLink to="/campaigns" icon={<Megaphone size={20}/>} label="Campaigns" currentPath={location.pathname} />
                     <SidebarLink to="/elections" icon={<Vote size={20}/>} label="Elections" currentPath={location.pathname} />
-                    
+                    <SidebarLink to="/membership" icon={<UserCheck size={20}/>} label="Membership" currentPath={location.pathname} />
+
                     {/* Admin Links */}
                     {role === 'admin' && (
                         <div className="mt-4 pt-4 border-t border-emerald-800/50 space-y-3">

@@ -42,8 +42,9 @@ model Tenant {
   elections            CommitteeElection[]
   candidates           CommitteeCandidate[]
   votes                CommitteeVote[]
-
-
+  membershipPlans  MembershipPlan[]
+  userMemberships  UserMembership[]
+  transactions     Transaction[]
 }
 
 model Domain {
@@ -80,6 +81,8 @@ model User {
   votesCast            CommitteeVote[]
   messagesSent     Message[] @relation("SentMessages")
   messagesReceived Message[] @relation("ReceivedMessages")
+  memberships      UserMembership[]
+  transactions     Transaction[]
 }
 
 // ------------------------------------------------------
@@ -449,4 +452,50 @@ model Message {
   receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
   @@index([senderId, receiverId]) // Speeds up chat history queries!
+}
+
+// ------------------------------------------------------
+// MEMBERSHIP & BILLING MODULE
+// ------------------------------------------------------
+
+model MembershipPlan {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  title       String
+  description String   @db.Text
+  price       Float
+  duration    Int      // Duration in days (e.g., 30, 365)
+  features    String?  @db.Text // Comma separated feature list
+  status      Int      @default(1)
+
+  memberships UserMembership[]
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model UserMembership {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  userId      Int
+  planId      Int
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  status      String   @default("active") // active, expired, cancelled
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan        MembershipPlan @relation(fields: [planId], references: [id])
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  userId      Int
+  amount      Float
+  type        String   // e.g., 'membership', 'donation'
+  reference   String?  // Mock Stripe/PayPal Session ID
+  status      String   @default("completed")
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

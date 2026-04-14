@@ -15,6 +15,7 @@ import Campaigns from './pages/alumni/Campaigns';
 import Elections from './pages/alumni/Elections';
 import Moderation from './pages/admin/Moderation';
 import Chat from './pages/alumni/Chat';
+import Membership from './pages/alumni/Membership';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/elections" element={<Elections />} />
           <Route path="/moderation" element={<Moderation />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/membership" element={<Membership />} />
         </Route>
       </Routes>
     </Router>
