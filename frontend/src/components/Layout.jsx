@@ -56,6 +56,7 @@ const Layout = () => {
                     <SidebarLink to="/membership" icon={<UserCheck size={20}/>} label="Membership" currentPath={location.pathname} />
                     <SidebarLink to="/feed" icon={<Newspaper size={20}/>} label="Social Feed" currentPath={location.pathname} />
                     <SidebarLink to="/helpdesk" icon={<MessageSquare size={20}/>} label="Helpdesk" currentPath={location.pathname} />
+                    <SidebarLink to="/master-data" icon={<ShieldAlert size={20}/>} label="Master Data" currentPath={location.pathname} isDanger />
 
                     {/* Admin Links */}
                     {role === 'admin' && (

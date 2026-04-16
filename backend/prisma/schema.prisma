@@ -20,37 +20,37 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   // Relationships (A tenant has many domains, users, alumni, and academic data)
-  domains      Domain[]
-  users        User[]
-  alumni       Alumnus[]
-  batches      Batch[]
-  departments  Department[]
-  passingYears PassingYear[]
-  jobs         Job[]
-  events       Event[]
-  newsCategories   NewsCategory[]
-  news             News[]
-  noticeCategories NoticeCategory[]
-  notices          Notice[]
-  campaignCategories CampaignCategory[]
-  campaigns          Campaign[]
-  donations          Donation[]
-  committeeCategories  CommitteeCategory[]
+  domains               Domain[]
+  users                 User[]
+  alumni                Alumnus[]
+  batches               Batch[]
+  departments           Department[]
+  passingYears          PassingYear[]
+  jobs                  Job[]
+  events                Event[]
+  newsCategories        NewsCategory[]
+  news                  News[]
+  noticeCategories      NoticeCategory[]
+  notices               Notice[]
+  campaignCategories    CampaignCategory[]
+  campaigns             Campaign[]
+  donations             Donation[]
+  committeeCategories   CommitteeCategory[]
   committeeDesignations CommitteeDesignation[]
-  committees           Committee[]
-  committeeMembers     CommitteeBoardMember[]
-  elections            CommitteeElection[]
-  candidates           CommitteeCandidate[]
-  votes                CommitteeVote[]
-  membershipPlans  MembershipPlan[]
-  userMemberships  UserMembership[]
-  transactions     Transaction[]
-  posts            Post[]
-  postMedia        PostMedia[]
-  postLikes        PostLike[]
-  postComments     PostComment[]
-  tickets          Ticket[]
-  ticketReplies    TicketReply[]
+  committees            Committee[]
+  committeeMembers      CommitteeBoardMember[]
+  elections             CommitteeElection[]
+  candidates            CommitteeCandidate[]
+  votes                 CommitteeVote[]
+  membershipPlans       MembershipPlan[]
+  userMemberships       UserMembership[]
+  transactions          Transaction[]
+  posts                 Post[]
+  postMedia             PostMedia[]
+  postLikes             PostLike[]
+  postComments          PostComment[]
+  tickets               Ticket[]
+  ticketReplies         TicketReply[]
 }
 
 model Domain {
@@ -77,167 +77,164 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  alumnusProfile    Alumnus?  // One-to-One relationship
-  jobs         Job[]
-  campaigns          Campaign[]
-  donations          Donation[]
+  tenant               Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumnusProfile       Alumnus? // One-to-One relationship
+  jobs                 Job[]
+  campaigns            Campaign[]
+  donations            Donation[]
   committeeMemberships CommitteeBoardMember[]
   candidacies          CommitteeCandidate[]
   votesCast            CommitteeVote[]
-  messagesSent     Message[] @relation("SentMessages")
-  messagesReceived Message[] @relation("ReceivedMessages")
-  memberships      UserMembership[]
-  transactions     Transaction[]
-  posts            Post[]
-  postLikes        PostLike[]
-  postComments     PostComment[]
-  tickets          Ticket[]
-  ticketReplies    TicketReply[]
+  messagesSent         Message[]              @relation("SentMessages")
+  messagesReceived     Message[]              @relation("ReceivedMessages")
+  memberships          UserMembership[]
+  transactions         Transaction[]
+  posts                Post[]
+  postLikes            PostLike[]
+  postComments         PostComment[]
+  tickets              Ticket[]
+  ticketReplies        TicketReply[]
 }
 
 // ------------------------------------------------------
 // ACADEMIC DATA 
 // ------------------------------------------------------
 model Batch {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   tenantId  String
   name      String
-  status    Int       @default(1)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  alumni    Alumnus[]
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni Alumnus[]
 }
 
 model Department {
-  id         Int       @id @default(autoincrement())
-  tenantId   String
-  name       String
-  short_name String?
-  status     Int       @default(1)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  
-  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  alumni     Alumnus[]
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  name      String
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  tenant Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni Alumnus[]
 }
 
 model PassingYear {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   tenantId  String
-  name      String
-  status    Int       @default(1)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  alumni    Alumnus[]
+  year      String   @unique
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  tenant Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  alumni Alumnus[]
 }
 
 // ------------------------------------------------------
 // ALUMNUS PROFILE 
 // ------------------------------------------------------
 model Alumnus {
-  id              Int       @id @default(autoincrement())
-  tenantId        String
-  userId          Int       @unique
-  
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  userId   Int    @unique
+
   // Academic Foreign Keys (Mapped to tables above)
-  batchId         Int?
-  departmentId    Int?
-  passingYearId   Int?
+  batchId       Int?
+  departmentId  Int?
+  passingYearId Int?
 
   // Personal Details
-  first_name      String
-  last_name       String
-  official_email  String?   // Your custom XAMPP feature!
-  nickname        String?
-  phone           String?
-  dob             DateTime?
-  blood_group     String?
-  gender          String?
-  about_me        String?   @db.Text
-  
+  first_name     String
+  last_name      String
+  official_email String? // Your custom XAMPP feature!
+  nickname       String?
+  phone          String?
+  dob            DateTime?
+  blood_group    String?
+  gender         String?
+  about_me       String?   @db.Text
+
   // Professional Details
-  company         String?
-  designation     String?
-  
+  company     String?
+  designation String?
+
   // Media Files (Paths)
-  profile_pic     String?
-  
+  profile_pic String?
+
   // Social Links
-  facebook_url    String?
-  twitter_url     String?
-  linkedin_url    String?
-  instagram_url   String?
-  github_url      String?
-  
+  facebook_url  String?
+  twitter_url   String?
+  linkedin_url  String?
+  instagram_url String?
+  github_url    String?
+
   // Location Details
-  country_id      Int?      // We will map this when we build the XAMPP Country table
-  state           String?
-  city            String?
-  zip             String?
-  address         String?   @db.Text
-  
-  status          Int       @default(1)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  country_id Int? // We will map this when we build the XAMPP Country table
+  state      String?
+  city       String?
+  zip        String?
+  address    String? @db.Text
+
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Prisma Relational Mappings
-  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  batch           Batch?       @relation(fields: [batchId], references: [id])
-  department      Department?  @relation(fields: [departmentId], references: [id])
-  passingYear     PassingYear? @relation(fields: [passingYearId], references: [id])
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch       Batch?       @relation(fields: [batchId], references: [id])
+  department  Department?  @relation(fields: [departmentId], references: [id])
+  passingYear PassingYear? @relation(fields: [passingYearId], references: [id])
 }
 
 // ------------------------------------------------------
 // JOB BOARD MODULE
 // ------------------------------------------------------
 model Job {
-  id                  Int       @id @default(autoincrement())
-  tenantId            String
-  userId              Int       // The alumnus who posted the job
-  
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  userId   Int // The alumnus who posted the job
+
   title               String
   company             String
   location            String?
   description         String    @db.Text
   salary_range        String?
   experience_required String?
-  apply_link          String?   // URL or email to apply
+  apply_link          String? // URL or email to apply
   deadline            DateTime?
-  
-  status              Int       @default(1) // 1 = Active, 0 = Closed
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+
+  status    Int      @default(1) // 1 = Active, 0 = Closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Prisma Relational Mappings
-  tenant              Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  postedBy            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  postedBy User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
 // EVENTS MODULE
 // ------------------------------------------------------
 model Event {
-  id            Int      @id @default(autoincrement())
-  tenantId      String
-  
-  title         String
-  description   String   @db.Text
-  date          DateTime
-  location      String
-  banner_image  String?  // URL path for the uploaded poster
-  
-  status        Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id       Int    @id @default(autoincrement())
+  tenantId String
+
+  title        String
+  description  String   @db.Text
+  date         DateTime
+  location     String
+  banner_image String? // URL path for the uploaded poster
+
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Prisma Relational Mapping
-  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
@@ -245,56 +242,56 @@ model Event {
 // ------------------------------------------------------
 
 model NewsCategory {
-  id        Int      @id @default(autoincrement())
-  tenantId  String
-  name      String
-  
-  news      News[]
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  name     String
+
+  news   News[]
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model News {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  categoryId  Int
-  
-  title       String
-  image       String?  // URL path for the news thumbnail
-  details     String   @db.Text
-  date        DateTime @default(now())
-  status      Int      @default(1) // 1 = Published, 0 = Draft
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int    @id @default(autoincrement())
+  tenantId   String
+  categoryId Int
 
-  category    NewsCategory @relation(fields: [categoryId], references: [id])
-  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title   String
+  image   String? // URL path for the news thumbnail
+  details String   @db.Text
+  date    DateTime @default(now())
+  status  Int      @default(1) // 1 = Published, 0 = Draft
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category NewsCategory @relation(fields: [categoryId], references: [id])
+  tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model NoticeCategory {
-  id        Int      @id @default(autoincrement())
-  tenantId  String
-  name      String
-  
-  notices   Notice[]
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  name     String
+
+  notices Notice[]
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Notice {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  categoryId  Int
-  
-  title       String
-  details     String   @db.Text
-  date        DateTime @default(now())
-  status      Int      @default(1)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int    @id @default(autoincrement())
+  tenantId   String
+  categoryId Int
 
-  category    NoticeCategory @relation(fields: [categoryId], references: [id])
-  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title   String
+  details String   @db.Text
+  date    DateTime @default(now())
+  status  Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category NoticeCategory @relation(fields: [categoryId], references: [id])
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
@@ -302,51 +299,51 @@ model Notice {
 // ------------------------------------------------------
 
 model CampaignCategory {
-  id        Int        @id @default(autoincrement())
-  tenantId  String
-  name      String
-  
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  name     String
+
   campaigns Campaign[]
   tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Campaign {
-  id            Int      @id @default(autoincrement())
-  tenantId      String
-  categoryId    Int
-  userId        Int      // The user/admin who organized it
-  
+  id         Int    @id @default(autoincrement())
+  tenantId   String
+  categoryId Int
+  userId     Int // The user/admin who organized it
+
   title         String
   description   String   @db.Text
-  image         String?  // Optional banner
-  target_amount Float    // How much they want to raise
+  image         String? // Optional banner
+  target_amount Float // How much they want to raise
   raised_amount Float    @default(0) // Automatically tracked
   deadline      DateTime
-  status        Int      @default(1) 
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        Int      @default(1)
 
-  category      CampaignCategory @relation(fields: [categoryId], references: [id])
-  organizer     User             @relation(fields: [userId], references: [id])
-  donations     Donation[]
-  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category  CampaignCategory @relation(fields: [categoryId], references: [id])
+  organizer User             @relation(fields: [userId], references: [id])
+  donations Donation[]
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Donation {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  campaignId  Int
-  userId      Int      // The alumnus who donated
-  
-  amount      Float
-  status      String   @default("completed") // Will tie to payment gateways later
-  
-  createdAt   DateTime @default(now())
+  id         Int    @id @default(autoincrement())
+  tenantId   String
+  campaignId Int
+  userId     Int // The alumnus who donated
 
-  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  donor       User     @relation(fields: [userId], references: [id])
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  amount Float
+  status String @default("completed") // Will tie to payment gateways later
+
+  createdAt DateTime @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  donor    User     @relation(fields: [userId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
@@ -354,113 +351,113 @@ model Donation {
 // ------------------------------------------------------
 
 model CommitteeCategory {
-  id          Int         @id @default(autoincrement())
-  tenantId    String
-  name        String
-  committees  Committee[]
-  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id         Int         @id @default(autoincrement())
+  tenantId   String
+  name       String
+  committees Committee[]
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model CommitteeDesignation {
-  id          Int         @id @default(autoincrement())
-  tenantId    String
-  name        String
-  candidates  CommitteeCandidate[]
-  members     CommitteeBoardMember[]
-  votes       CommitteeVote[]
-  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id         Int                    @id @default(autoincrement())
+  tenantId   String
+  name       String
+  candidates CommitteeCandidate[]
+  members    CommitteeBoardMember[]
+  votes      CommitteeVote[]
+  tenant     Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Committee {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   tenantId    String
   categoryId  Int
   name        String
-  description String?   @db.Text
-  status      Int       @default(1)
+  description String? @db.Text
+  status      Int     @default(1)
 
-  category    CommitteeCategory @relation(fields: [categoryId], references: [id])
-  members     CommitteeBoardMember[]
-  elections   CommitteeElection[]
-  tenant      Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category  CommitteeCategory      @relation(fields: [categoryId], references: [id])
+  members   CommitteeBoardMember[]
+  elections CommitteeElection[]
+  tenant    Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model CommitteeBoardMember {
-  id            Int       @id @default(autoincrement())
+  id            Int    @id @default(autoincrement())
   tenantId      String
   committeeId   Int
   userId        Int
   designationId Int
 
-  committee     Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
-  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
-  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  committee   Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designation CommitteeDesignation @relation(fields: [designationId], references: [id])
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model CommitteeElection {
-  id            Int       @id @default(autoincrement())
-  tenantId      String
-  committeeId   Int
-  title         String
-  start_date    DateTime
-  end_date      DateTime
-  status        Int       @default(1) // 1 = Active, 0 = Closed
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  committeeId Int
+  title       String
+  start_date  DateTime
+  end_date    DateTime
+  status      Int      @default(1) // 1 = Active, 0 = Closed
 
-  committee     Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
-  candidates    CommitteeCandidate[]
-  votes         CommitteeVote[]
-  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  committee  Committee            @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+  candidates CommitteeCandidate[]
+  votes      CommitteeVote[]
+  tenant     Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model CommitteeCandidate {
-  id            Int       @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   tenantId      String
   electionId    Int
   userId        Int
   designationId Int
-  manifesto     String?   @db.Text
-  votes_count   Int       @default(0)
-  status        Int       @default(1) // Assuming 1 is approved for test purposes
+  manifesto     String? @db.Text
+  votes_count   Int     @default(0)
+  status        Int     @default(1) // Assuming 1 is approved for test purposes
 
-  election      CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
-  votes         CommitteeVote[]
-  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  election    CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designation CommitteeDesignation @relation(fields: [designationId], references: [id])
+  votes       CommitteeVote[]
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model CommitteeVote {
-  id            Int       @id @default(autoincrement())
+  id            Int    @id @default(autoincrement())
   tenantId      String
   electionId    Int
   voterId       Int
   candidateId   Int
-  designationId Int       // We track the role so we can block double-voting
+  designationId Int // We track the role so we can block double-voting
 
-  election      CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  voter         User                 @relation(fields: [voterId], references: [id], onDelete: Cascade)
-  candidate     CommitteeCandidate   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  designation   CommitteeDesignation @relation(fields: [designationId], references: [id])
-  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  election    CommitteeElection    @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  voter       User                 @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  candidate   CommitteeCandidate   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  designation CommitteeDesignation @relation(fields: [designationId], references: [id])
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   // CRITICAL DATABASE SECURITY: A user can only vote ONCE per designation in a specific election
-  @@unique([electionId, voterId, designationId]) 
+  @@unique([electionId, voterId, designationId])
 }
 
 // ------------------------------------------------------
 // MESSAGING & CHAT MODULE
 // ------------------------------------------------------
 model Message {
-  id          Int      @id @default(autoincrement())
-  senderId    Int
-  receiverId  Int
-  content     String   @db.Text
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  content    String   @db.Text
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender   User @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
   @@index([senderId, receiverId]) // Speeds up chat history queries!
 }
@@ -470,45 +467,45 @@ model Message {
 // ------------------------------------------------------
 
 model MembershipPlan {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   tenantId    String
   title       String
-  description String   @db.Text
+  description String  @db.Text
   price       Float
-  duration    Int      // Duration in days (e.g., 30, 365)
-  features    String?  @db.Text // Comma separated feature list
-  status      Int      @default(1)
+  duration    Int // Duration in days (e.g., 30, 365)
+  features    String? @db.Text // Comma separated feature list
+  status      Int     @default(1)
 
   memberships UserMembership[]
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model UserMembership {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  userId      Int
-  planId      Int
-  startDate   DateTime @default(now())
-  endDate     DateTime
-  status      String   @default("active") // active, expired, cancelled
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  userId    Int
+  planId    Int
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    String   @default("active") // active, expired, cancelled
 
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan        MembershipPlan @relation(fields: [planId], references: [id])
-  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan   MembershipPlan @relation(fields: [planId], references: [id])
+  tenant Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  userId      Int
-  amount      Float
-  type        String   // e.g., 'membership', 'donation'
-  reference   String?  // Mock Stripe/PayPal Session ID
-  status      String   @default("completed")
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  userId    Int
+  amount    Float
+  type      String // e.g., 'membership', 'donation'
+  reference String? // Mock Stripe/PayPal Session ID
+  status    String   @default("completed")
+  createdAt DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
@@ -516,59 +513,59 @@ model Transaction {
 // ------------------------------------------------------
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  userId      Int
-  body        String   @db.Text
-  status      Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  userId    Int
+  body      String   @db.Text
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  media       PostMedia[]
-  likes       PostLike[]
-  comments    PostComment[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  media    PostMedia[]
+  likes    PostLike[]
+  comments PostComment[]
 }
 
 model PostMedia {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  postId      Int
-  fileUrl     String
-  fileType    String   @default("image") // image or video
-  
-  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  tenantId String
+  postId   Int
+  fileUrl  String
+  fileType String @default("image") // image or video
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model PostLike {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  postId      Int
-  userId      Int
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
 
-  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   // A user can only like a specific post once!
-  @@unique([postId, userId]) 
+  @@unique([postId, userId])
 }
 
 model PostComment {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  postId      Int
-  userId      Int
-  body        String   @db.Text
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  postId    Int
+  userId    Int
+  body      String   @db.Text
+  createdAt DateTime @default(now())
 
-  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 // ------------------------------------------------------
@@ -576,28 +573,28 @@ model PostComment {
 // ------------------------------------------------------
 
 model Ticket {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  userId      Int      // The alumnus who opened the ticket
-  subject     String
-  status      String   @default("open") // open, in_progress, closed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  userId    Int // The alumnus who opened the ticket
+  subject   String
+  status    String   @default("open") // open, in_progress, closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  replies     TicketReply[]
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant  Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  replies TicketReply[]
 }
 
 model TicketReply {
-  id          Int      @id @default(autoincrement())
-  tenantId    String
-  ticketId    Int
-  userId      Int      // Can be the alumnus OR the admin replying
-  message     String   @db.Text
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  tenantId  String
+  ticketId  Int
+  userId    Int // Can be the alumnus OR the admin replying
+  message   String   @db.Text
+  createdAt DateTime @default(now())
 
-  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

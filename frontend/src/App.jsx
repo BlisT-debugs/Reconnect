@@ -18,6 +18,7 @@ import Chat from './pages/alumni/Chat';
 import Membership from './pages/alumni/Membership';
 import SocialFeed from './pages/alumni/SocialFeed';
 import Helpdesk from './pages/alumni/Helpdesk';
+import MasterData from './pages/alumni/MasterData';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
           <Route path="/membership" element={<Membership />} />
           <Route path="/feed" element={<SocialFeed />} />
           <Route path="/helpdesk" element={<Helpdesk />} />
+          <Route path="/master-data" element={<MasterData />} />
         </Route>
       </Routes>
     </Router>
