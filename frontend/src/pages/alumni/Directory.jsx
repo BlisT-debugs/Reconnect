@@ -9,7 +9,6 @@ const Directory = () => {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // 🔹 TERI FUNCTIONALITY (No Changes)
     useEffect(() => {
         const fetchDirectory = async () => {
             try {

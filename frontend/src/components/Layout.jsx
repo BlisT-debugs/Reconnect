@@ -11,7 +11,6 @@ const Layout = () => {
     const location = useLocation(); 
     const [role, setRole] = useState('user');
 
-    // 🔹 TERI FUNCTIONALITY (No Changes)
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -55,6 +54,7 @@ const Layout = () => {
                     <SidebarLink to="/campaigns" icon={<Megaphone size={20}/>} label="Campaigns" currentPath={location.pathname} />
                     <SidebarLink to="/elections" icon={<Vote size={20}/>} label="Elections" currentPath={location.pathname} />
                     <SidebarLink to="/membership" icon={<UserCheck size={20}/>} label="Membership" currentPath={location.pathname} />
+                    <SidebarLink to="/feed" icon={<Newspaper size={20}/>} label="Social Feed" currentPath={location.pathname} />
 
                     {/* Admin Links */}
                     {role === 'admin' && (

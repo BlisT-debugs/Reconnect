@@ -61,6 +61,7 @@ app.use('/api/campaigns', require('./routes/campaignRoutes'));
 app.use('/api/elections', require('./routes/electionRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/memberships', require('./routes/membershipRoutes'));
+app.use('/api/posts', require('./routes/postRoutes'));
 
 app.get('/', (req, res) => {
     res.send('PERN Alumni API is online and waiting...');

@@ -45,6 +45,10 @@ model Tenant {
   membershipPlans  MembershipPlan[]
   userMemberships  UserMembership[]
   transactions     Transaction[]
+  posts            Post[]
+  postMedia        PostMedia[]
+  postLikes        PostLike[]
+  postComments     PostComment[]
 }
 
 model Domain {
@@ -83,6 +87,9 @@ model User {
   messagesReceived Message[] @relation("ReceivedMessages")
   memberships      UserMembership[]
   transactions     Transaction[]
+  posts            Post[]
+  postLikes        PostLike[]
+  postComments     PostComment[]
 }
 
 // ------------------------------------------------------
@@ -496,6 +503,66 @@ model Transaction {
   status      String   @default("completed")
   createdAt   DateTime @default(now())
 
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// SOCIAL FEED MODULE
+// ------------------------------------------------------
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  userId      Int
+  body        String   @db.Text
+  status      Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  media       PostMedia[]
+  likes       PostLike[]
+  comments    PostComment[]
+}
+
+model PostMedia {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  postId      Int
+  fileUrl     String
+  fileType    String   @default("image") // image or video
+  
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model PostLike {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  postId      Int
+  userId      Int
+  createdAt   DateTime @default(now())
+
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // A user can only like a specific post once!
+  @@unique([postId, userId]) 
+}
+
+model PostComment {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  postId      Int
+  userId      Int
+  body        String   @db.Text
+  createdAt   DateTime @default(now())
+
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
