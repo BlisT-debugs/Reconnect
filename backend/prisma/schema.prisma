@@ -49,6 +49,8 @@ model Tenant {
   postMedia        PostMedia[]
   postLikes        PostLike[]
   postComments     PostComment[]
+  tickets          Ticket[]
+  ticketReplies    TicketReply[]
 }
 
 model Domain {
@@ -90,6 +92,8 @@ model User {
   posts            Post[]
   postLikes        PostLike[]
   postComments     PostComment[]
+  tickets          Ticket[]
+  ticketReplies    TicketReply[]
 }
 
 // ------------------------------------------------------
@@ -563,6 +567,37 @@ model PostComment {
   createdAt   DateTime @default(now())
 
   post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------
+// HELPDESK & SUPPORT TICKETS MODULE
+// ------------------------------------------------------
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  userId      Int      // The alumnus who opened the ticket
+  subject     String
+  status      String   @default("open") // open, in_progress, closed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  replies     TicketReply[]
+}
+
+model TicketReply {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  ticketId    Int
+  userId      Int      // Can be the alumnus OR the admin replying
+  message     String   @db.Text
+  createdAt   DateTime @default(now())
+
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
