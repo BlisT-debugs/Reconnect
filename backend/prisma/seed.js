@@ -3,7 +3,6 @@ const prisma = require('../config/prisma'); // Use our custom adapter setup
 
 async function main() {
     console.log('Seeding database...');
-// ... keep the rest of the file exactly the same
 
     // 1. Create the default "admin" Tenant
     const tenant = await prisma.tenant.upsert({

@@ -15,7 +15,6 @@ const Chat = () => {
     const messagesEndRef = useRef(null);
     const selectedUserIdRef = useRef(null);
 
-    // 🔹 TERI FUNCTIONALITY (No Changes)
     useEffect(() => {
         selectedUserIdRef.current = selectedUser?.id;
     }, [selectedUser]);

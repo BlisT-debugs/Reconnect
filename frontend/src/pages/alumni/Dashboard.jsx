@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-    // 🔹 TERI FUNCTIONALITY (No Changes Here)
+    
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
@@ -45,7 +45,6 @@ const Dashboard = () => {
         </div>
     );
 
-    // 🔹 NAYA PREMIUM UI START
     return (
         <div className="p-8 max-w-7xl mx-auto font-sans">
             
@@ -101,7 +100,6 @@ const Dashboard = () => {
                     <InfoRow label="Full Name" value={userData.name} />
                     <InfoRow label="Email Address" value={userData.email} />
                     <InfoRow label="Role Type" value={userData.role.toUpperCase()} />
-                    <InfoRow label="Tenant Link" value={userData.tenantId} />
                 </div>
             </div>
 
