@@ -19,6 +19,8 @@ import Membership from './pages/alumni/Membership';
 import SocialFeed from './pages/alumni/SocialFeed';
 import Helpdesk from './pages/alumni/Helpdesk';
 import MasterData from './pages/alumni/MasterData';
+import ForgotPassword from './pages/public/ForgotPassword';
+import ResetPassword from './pages/public/ResetPassword';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         
         {/* PRIVATE ROUTES (Wrapped inside the Sidebar Layout) */}
         <Route element={<Layout />}>

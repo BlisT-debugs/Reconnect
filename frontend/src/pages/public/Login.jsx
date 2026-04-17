@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../../services/api";
 
 const Login = () => {
@@ -73,6 +73,10 @@ const Login = () => {
           <span className={isSignUp ? "font-semibold text-emerald-700" : "text-gray-400"}>
             Register
           </span>
+        </div>
+
+        <div style={{ marginTop: '10px', textAlign: 'center' }}>
+          <Link to="/forgot-password" style={{ color: '#ffc107', textDecoration: 'none', fontSize: '14px' }}>Forgot Password?</Link>
         </div>
 
         {/* TITLE */}
