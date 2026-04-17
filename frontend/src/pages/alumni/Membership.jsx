@@ -34,13 +34,25 @@ const Membership = () => {
         fetchData();
     };
 
-    const handlePurchase = async (planId, planName) => {
-        if (!window.confirm(`Simulate secure payment for the ${planName} Plan?`)) return;
+    const handlePurchase = async (planId, planName, price) => {
+        if (!window.confirm(`Proceed to secure checkout for the ${planName} Plan?`)) return;
+        
         try {
-            await API.post('/memberships/purchase', { planId }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-            alert(`Payment successful! Welcome to ${planName}.`);
-            fetchData();
-        } catch (err) { alert('Transaction failed'); }
+            // Hit our backend to generate the session
+            const { data } = await API.post('/memberships/purchase', { planId }, { 
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+            });
+            
+            // Redirect the user to Stripe's hosted checkout page!
+            if (data.url) {
+                window.location.href = data.url; 
+            } else if (data.free) {
+                alert(`Success! Welcome to ${planName}.`);
+                fetchData();
+            }
+        } catch (err) { 
+            alert('Failed to initialize checkout'); 
+        }
     };
 
     if (loading) return (
@@ -138,7 +150,7 @@ const Membership = () => {
                                     {plan.title}
                                 </h2>
                                 <div className="flex items-start justify-center text-gray-900 mb-4">
-                                    <span className="text-2xl font-bold mt-2">₹</span>
+                                    <span className="text-2xl font-bold mt-2">$</span>
                                     <span className="text-6xl font-black font-serif">{plan.price}</span>
                                 </div>
                                 <p className="text-gray-400 text-sm italic h-10 line-clamp-2">

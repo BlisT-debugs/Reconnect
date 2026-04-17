@@ -9,6 +9,8 @@ const path = require('path');
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
+const { handleStripeWebhook } = require('./controllers/webhookController');
+
 
 // Initialize Socket.IO server
 const io = new Server(server, {
@@ -43,6 +45,7 @@ io.on('connection', (socket) => {
     });
 });
 
+app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);
 app.use(express.json()); 
 app.use(cors());         
 app.use(helmet({

@@ -159,11 +159,11 @@ const Campaigns = () => {
                                     <div className="flex justify-between items-end">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Raised</span>
-                                            <span className="text-xl font-black text-emerald-700">₹{camp.raised_amount.toLocaleString()}</span>
+                                            <span className="text-xl font-black text-emerald-700">${camp.raised_amount.toLocaleString()}</span>
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Target</span>
-                                            <span className="text-sm font-bold text-gray-600">₹{camp.target_amount.toLocaleString()}</span>
+                                            <span className="text-sm font-bold text-gray-600">${camp.target_amount.toLocaleString()}</span>
                                         </div>
                                     </div>
 
@@ -177,7 +177,7 @@ const Campaigns = () => {
                                     
                                     <div className="flex justify-between items-center text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">
                                         <span className="flex items-center gap-1"><TrendingUp size={12}/> {progress.toFixed(0)}% Achieved</span>
-                                        <span className="text-gray-400">{camp.target_amount - camp.raised_amount > 0 ? `₹${(camp.target_amount - camp.raised_amount).toLocaleString()} more to go` : 'Goal Reached!'}</span>
+                                        <span className="text-gray-400">{camp.target_amount - camp.raised_amount > 0 ? `$${(camp.target_amount - camp.raised_amount).toLocaleString()} more to go` : 'Goal Reached!'}</span>
                                     </div>
 
                                     <button 

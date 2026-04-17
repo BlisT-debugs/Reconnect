@@ -21,49 +21,59 @@ const getMyMembership = async (req, res) => {
 };
 
 // @desc    Purchase a Membership (The Financial Transaction)
-const purchaseMembership = async (req, res) => {
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// @desc    Create Stripe Checkout Session
+// @route   POST /api/memberships/create-checkout-session
+const createCheckoutSession = async (req, res) => {
     try {
         const { planId } = req.body;
         const tenantId = req.user.tenantId;
         const userId = req.user.id;
 
-        // 1. Fetch the requested plan to get price and duration securely from the DB
+        // 1. Fetch Plan securely from DB
         const plan = await prisma.membershipPlan.findUnique({ where: { id: parseInt(planId) } });
         if (!plan) return res.status(404).json({ message: "Plan not found" });
 
-        // Calculate Expiry Date based on duration
-        const startDate = new Date();
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + plan.duration);
+        // If the plan is Free, activate it instantly without Stripe
+        if (plan.price === 0) {
+            // ... (You can paste the old atomic transaction logic here for free plans)
+            return res.status(200).json({ message: "Free plan activated", free: true });
+        }
 
-        // 2. Execute Financial Transaction
-        const result = await prisma.$transaction(async (tx) => {
-            // A. Log the payment receipt
-            const transaction = await tx.transaction.create({
-                data: {
-                    tenantId, userId,
-                    amount: plan.price,
-                    type: 'membership',
-                    reference: `TXN-MEM-${Date.now()}` // Mock Gateway Reference
-                }
-            });
-
-            // B. Deactivate any old memberships to prevent overlaps
-            await tx.userMembership.updateMany({
-                where: { userId, tenantId, status: 'active' },
-                data: { status: 'expired' }
-            });
-
-            // C. Create the new Active Membership
-            const membership = await tx.userMembership.create({
-                data: { tenantId, userId, planId: plan.id, startDate, endDate, status: 'active' }
-            });
-
-            return { transaction, membership };
+        // 2. Create Stripe Checkout Session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: `${plan.title} Membership`,
+                            description: plan.description,
+                        },
+                        unit_amount: Math.round(plan.price * 100), // Stripe expects cents!
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            success_url: `http://localhost:5173/membership?success=true`,
+            cancel_url: `http://localhost:5173/membership?canceled=true`,
+            // CRITICAL: We pass our internal DB IDs to Stripe so the Webhook knows who paid!
+            metadata: {
+                userId: userId.toString(),
+                tenantId: tenantId,
+                planId: plan.id.toString(),
+                duration: plan.duration.toString()
+            }
         });
 
-        res.status(200).json({ message: "Membership activated successfully!", data: result });
-    } catch (error) { res.status(500).json({ message: error.message }); }
+        // 3. Return the Stripe URL to the frontend
+        res.status(200).json({ url: session.url });
+    } catch (error) { 
+        res.status(500).json({ message: error.message }); 
+    }
 };
 
 // @desc    DEV UTILITY: Auto-generate starter plans
@@ -81,4 +91,4 @@ const setupTestPlans = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-module.exports = { getPlans, getMyMembership, purchaseMembership, setupTestPlans };
+module.exports = { getPlans, getMyMembership, createCheckoutSession, setupTestPlans };

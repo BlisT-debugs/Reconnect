@@ -43,11 +43,11 @@ const ResetPassword = () => {
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <input 
                         type="password" 
-                        placeholder="New Password (min 5 chars)" 
+                        placeholder="New Password (min 6 chars)" 
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
                         required 
-                        minLength="5"
+                        minLength="6"
                         style={{ padding: '12px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#2a2a3c', color: 'white', outline: 'none' }}
                     />
                     <input 
@@ -56,7 +56,7 @@ const ResetPassword = () => {
                         value={confirmPassword} 
                         onChange={(e) => setConfirmPassword(e.target.value)} 
                         required 
-                        minLength="5"
+                        minLength="6"
                         style={{ padding: '12px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#2a2a3c', color: 'white', outline: 'none' }}
                     />
                     <button type="submit" style={{ padding: '12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
