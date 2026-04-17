@@ -33,46 +33,65 @@ const Layout = () => {
     return (
         <div className="flex min-h-screen bg-gray-50 font-sans">
             
-            {/* 🔹 FLOATING SIDEBAR */}
-            <aside className="fixed left-4 top-4 bottom-4 w-20 bg-emerald-900 rounded-3xl shadow-2xl z-50 flex flex-col items-center py-6 overflow-visible">
+            {/* 🔹 CSS Hack for Hiding Scrollbar but keeping scroll active */}
+            <style>
+                {`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                `}
+            </style>
+
+            {/* 🔹 FLOATING SIDEBAR (Modified to fix scrolling without clipping) */}
+            <aside className="fixed left-4 top-4 bottom-4 w-20 bg-emerald-900 rounded-3xl shadow-2xl z-50 flex flex-col py-6 overflow-visible">
                 
-                {/* Logo */}
-                <div className="flex items-center justify-center w-full mb-8 pb-4 border-b border-emerald-800/50">
+                {/* Logo Area (Fixed at top) */}
+                <div className="flex items-center justify-center w-full mb-6 pb-4 border-b border-emerald-800/50 shrink-0">
                     <GraduationCap className="text-emerald-400" size={32} />
                 </div>
 
-                {/* Navigation Links */}
-                <nav className="flex-1 w-full px-4 space-y-3">
-                    <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20}/>} label="Dashboard" currentPath={location.pathname} />
-                    <SidebarLink to="/edit-profile" icon={<User size={20}/>} label="My Profile" currentPath={location.pathname} />
-                    <SidebarLink to="/directory" icon={<Users size={20}/>} label="Directory" currentPath={location.pathname} />
-                    <SidebarLink to="/chat" icon={<MessageSquare size={20}/>} label="Messenger" currentPath={location.pathname} />
-                    <SidebarLink to="/jobs" icon={<Briefcase size={20}/>} label="Job Board" currentPath={location.pathname} />
-                    <SidebarLink to="/events" icon={<Calendar size={20}/>} label="Events" currentPath={location.pathname} />
-                    <SidebarLink to="/news" icon={<Newspaper size={20}/>} label="News" currentPath={location.pathname} />
-                    <SidebarLink to="/notices" icon={<Bell size={20}/>} label="Notices" currentPath={location.pathname} />
-                    <SidebarLink to="/campaigns" icon={<Megaphone size={20}/>} label="Campaigns" currentPath={location.pathname} />
-                    <SidebarLink to="/elections" icon={<Vote size={20}/>} label="Elections" currentPath={location.pathname} />
-                    <SidebarLink to="/membership" icon={<UserCheck size={20}/>} label="Membership" currentPath={location.pathname} />
-                    <SidebarLink to="/feed" icon={<Newspaper size={20}/>} label="Social Feed" currentPath={location.pathname} />
-                    <SidebarLink to="/helpdesk" icon={<MessageSquare size={20}/>} label="Helpdesk" currentPath={location.pathname} />
-                    <SidebarLink to="/master-data" icon={<ShieldAlert size={20}/>} label="Master Data" currentPath={location.pathname} isDanger />
+                {/* Navigation Links Container 
+                    - w-64 & pointer-events-none ensures it doesn't clip the expanded buttons 
+                      and doesn't block clicks on the main page.
+                    - overflow-y-auto adds the scroll!
+                */}
+                <nav 
+                    className="flex-1 w-64 overflow-y-auto pointer-events-none hide-scrollbar"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                    {/* Actual interactive column restricted to w-20 so it only captures scroll on the sidebar */}
+                    <div className="w-20 px-4 space-y-3 pb-4 pointer-events-auto">
+                        <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20}/>} label="Dashboard" currentPath={location.pathname} />
+                        <SidebarLink to="/edit-profile" icon={<User size={20}/>} label="My Profile" currentPath={location.pathname} />
+                        <SidebarLink to="/directory" icon={<Users size={20}/>} label="Directory" currentPath={location.pathname} />
+                        <SidebarLink to="/chat" icon={<MessageSquare size={20}/>} label="Messenger" currentPath={location.pathname} />
+                        <SidebarLink to="/jobs" icon={<Briefcase size={20}/>} label="Job Board" currentPath={location.pathname} />
+                        <SidebarLink to="/events" icon={<Calendar size={20}/>} label="Events" currentPath={location.pathname} />
+                        <SidebarLink to="/news" icon={<Newspaper size={20}/>} label="News" currentPath={location.pathname} />
+                        <SidebarLink to="/notices" icon={<Bell size={20}/>} label="Notices" currentPath={location.pathname} />
+                        <SidebarLink to="/campaigns" icon={<Megaphone size={20}/>} label="Campaigns" currentPath={location.pathname} />
+                        <SidebarLink to="/elections" icon={<Vote size={20}/>} label="Elections" currentPath={location.pathname} />
+                        <SidebarLink to="/membership" icon={<UserCheck size={20}/>} label="Membership" currentPath={location.pathname} />
+                        <SidebarLink to="/feed" icon={<Newspaper size={20}/>} label="Social Feed" currentPath={location.pathname} />
+                        <SidebarLink to="/helpdesk" icon={<MessageSquare size={20}/>} label="Helpdesk" currentPath={location.pathname} />
+                        <SidebarLink to="/master-data" icon={<ShieldAlert size={20}/>} label="Master Data" currentPath={location.pathname} isDanger />
 
-                    {/* Admin Links */}
-                    {role === 'admin' && (
-                        <div className="mt-4 pt-4 border-t border-emerald-800/50 space-y-3">
-                            <SidebarLink to="/admin" icon={<ShieldAlert size={20}/>} label="Admin Panel" currentPath={location.pathname} isDanger />
-                            <SidebarLink to="/moderation" icon={<AlertTriangle size={20}/>} label="Moderation" currentPath={location.pathname} isDanger />
-                        </div>
-                    )}
+                        {/* Admin Links */}
+                        {role === 'admin' && (
+                            <div className="mt-2 pt-4 border-t border-emerald-800/50 space-y-3">
+                                <SidebarLink to="/admin" icon={<ShieldAlert size={20}/>} label="Admin Panel" currentPath={location.pathname} isDanger />
+                                <SidebarLink to="/moderation" icon={<AlertTriangle size={20}/>} label="Moderation" currentPath={location.pathname} isDanger />
+                            </div>
+                        )}
+                    </div>
                 </nav>
 
-                {/* Logout Button */}
-                <div className="w-full px-4 pt-4 border-t border-emerald-800/50 mt-auto">
+                {/* Logout Button (Fixed at bottom) */}
+                <div className="w-full px-4 pt-4 border-t border-emerald-800/50 mt-auto shrink-0">
                     <div className="relative h-12 w-full z-10 hover:z-50">
                         <button 
                             onClick={handleLogout}
-                            className="group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden text-red-400 hover:bg-red-600 hover:text-white w-12 hover:w-40 hover:shadow-xl"
+                            className="group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden text-red-400 hover:bg-red-600 hover:text-white w-12 hover:w-40 hover:shadow-xl pointer-events-auto"
                         >
                             <div className="min-w-[24px] flex items-center justify-center"><LogOut size={20} /></div>
                             <span className="ml-4 font-medium whitespace-nowrap transition-opacity duration-300 opacity-0 group-hover:opacity-100">
@@ -99,7 +118,8 @@ const SidebarLink = ({ to, icon, label, currentPath, isDanger }) => {
         <div className="relative h-12 w-full z-10 hover:z-50">
             <Link 
                 to={to} 
-                className={`group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden
+                // pointer-events-auto is crucial here so the expanded pill is clickable!
+                className={`group absolute left-0 top-0 flex items-center h-12 px-3 rounded-xl transition-all duration-300 overflow-hidden pointer-events-auto
                 ${active ? 'bg-emerald-700 text-white w-12 hover:w-48 shadow-lg' : 'text-emerald-100/70 hover:bg-emerald-700 hover:text-white w-12 hover:w-48 hover:shadow-xl'}
                 ${isDanger ? 'text-red-400 hover:bg-red-600 hover:text-white' : ''}`}
             >

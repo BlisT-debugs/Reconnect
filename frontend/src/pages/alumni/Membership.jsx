@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import API from '../../services/api';
+import { 
+  CreditCard, ShieldCheck, AlertCircle, 
+  CheckCircle2, Settings, Zap, Crown 
+} from 'lucide-react';
 
 const Membership = () => {
     const [plans, setPlans] = useState([]);
@@ -39,57 +43,141 @@ const Membership = () => {
         } catch (err) { alert('Transaction failed'); }
     };
 
-    if (loading) return <p style={{ textAlign: 'center', marginTop: '50px', color: 'white' }}>Loading Pricing...</p>;
+    if (loading) return (
+        <div className="flex h-screen items-center justify-center bg-gray-50 text-emerald-800 font-bold animate-pulse">
+            Loading Membership Tiers...
+        </div>
+    );
 
     return (
-        <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px', fontFamily: 'sans-serif', color: 'white' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ color: '#007bff', margin: 0 }}>Membership Plans</h1>
+        <div className="p-8 max-w-7xl mx-auto font-sans">
+            
+            {/* Header Area */}
+            <div className="flex justify-between items-center mb-8 bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+                <div className="flex items-center gap-5">
+                    <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl">
+                        <Crown size={32} />
+                    </div>
+                    <div>
+                        <h1 className="text-4xl font-bold text-gray-900 font-serif">Alumni Memberships</h1>
+                        <p className="text-gray-500 mt-1 flex items-center gap-2">
+                            <CreditCard size={16} className="text-emerald-600"/> 
+                            Unlock premium network features and exclusive privileges
+                        </p>
+                    </div>
+                </div>
                 {role === 'admin' && plans.length === 0 && (
-                    <button onClick={handleSetup} style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        Auto-Gen Pricing Tiers
+                    <button 
+                        onClick={handleSetup} 
+                        className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-emerald-50 hover:text-emerald-700 transition-all border border-transparent hover:border-emerald-100"
+                    >
+                        <Settings size={18} /> Auto-Gen Pricing Tiers
                     </button>
                 )}
             </div>
 
-            {/* Current Active Status */}
+            {/* Current Active Status Banner */}
             {myMembership ? (
-                <div style={{ backgroundColor: '#28a745', padding: '20px', borderRadius: '8px', marginBottom: '30px', color: '#fff' }}>
-                    <h3 style={{ margin: '0 0 10px 0' }}>✅ Active Subscription: {myMembership.plan.title} Plan</h3>
-                    <p style={{ margin: 0 }}>Valid until: <strong>{new Date(myMembership.endDate).toLocaleDateString()}</strong></p>
+                <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-[1.5rem] mb-10 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-emerald-600 text-white rounded-xl shadow-md">
+                            <ShieldCheck size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-emerald-900 font-serif mb-1">
+                                Active Subscription: {myMembership.plan.title} Plan
+                            </h3>
+                            <p className="text-sm text-emerald-700 font-medium">
+                                Valid until: <strong className="bg-emerald-100 px-2 py-0.5 rounded-md">{new Date(myMembership.endDate).toLocaleDateString()}</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <span className="hidden md:flex px-4 py-2 bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-widest rounded-xl">
+                        All Systems Go
+                    </span>
                 </div>
             ) : (
-                <div style={{ backgroundColor: '#dc3545', padding: '20px', borderRadius: '8px', marginBottom: '30px', color: '#fff' }}>
-                    <h3 style={{ margin: '0 0 10px 0' }}>⚠️ No Active Subscription</h3>
-                    <p style={{ margin: 0 }}>Please select a plan below to unlock full network features.</p>
+                <div className="bg-amber-50 border border-amber-100 p-6 rounded-[1.5rem] mb-10 flex items-center gap-4 shadow-sm">
+                    <div className="p-3 bg-amber-500 text-white rounded-xl shadow-md">
+                        <AlertCircle size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-amber-900 font-serif mb-1">
+                            No Active Subscription
+                        </h3>
+                        <p className="text-sm text-amber-700 font-medium">
+                            Please select a plan below to unlock full network features, directory access, and premium events.
+                        </p>
+                    </div>
                 </div>
             )}
 
             {/* Pricing Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-                {plans.map((plan) => (
-                    <div key={plan.id} style={{ backgroundColor: '#1e1e2f', borderRadius: '8px', border: myMembership?.planId === plan.id ? '2px solid #28a745' : '1px solid #333', padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column' }}>
-                        <h2 style={{ margin: '0 0 10px 0', color: '#ffc107' }}>{plan.title}</h2>
-                        <h1 style={{ margin: '0 0 20px 0', fontSize: '36px' }}>${plan.price}</h1>
-                        <p style={{ color: '#aaa', marginBottom: '20px', fontStyle: 'italic' }}>{plan.description}</p>
-                        
-                        <div style={{ flex: 1, textAlign: 'left', marginBottom: '20px', padding: '15px', backgroundColor: '#2a2a3c', borderRadius: '4px' }}>
-                            <ul style={{ margin: 0, paddingLeft: '20px', color: '#ccc', lineHeight: '1.8' }}>
-                                {plan.features.split(',').map((feature, i) => (
-                                    <li key={i}>{feature.trim()}</li>
-                                ))}
-                            </ul>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {plans.map((plan) => {
+                    const isCurrent = myMembership?.planId === plan.id;
+                    
+                    return (
+                        <div 
+                            key={plan.id} 
+                            className={`relative bg-white rounded-[2.5rem] p-8 flex flex-col transition-all duration-300 hover:-translate-y-2
+                                ${isCurrent 
+                                    ? 'border-2 border-emerald-500 shadow-2xl shadow-emerald-100 scale-105 z-10' 
+                                    : 'border border-gray-100 shadow-sm hover:shadow-xl hover:border-emerald-200'
+                                }`}
+                        >
+                            {/* Highlight Badge for Current Plan */}
+                            {isCurrent && (
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md flex items-center gap-1.5">
+                                    <ShieldCheck size={14} /> Current Plan
+                                </div>
+                            )}
 
-                        {myMembership?.planId === plan.id ? (
-                            <button disabled style={{ padding: '15px', backgroundColor: '#444', color: '#888', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>Current Plan</button>
-                        ) : (
-                            <button onClick={() => handlePurchase(plan.id, plan.title)} style={{ padding: '15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                {plan.price === 0 ? 'Select Free' : 'Purchase Plan'}
+                            <div className="text-center mb-8 pt-4">
+                                <h2 className="text-2xl font-bold text-emerald-700 font-serif mb-4">
+                                    {plan.title}
+                                </h2>
+                                <div className="flex items-start justify-center text-gray-900 mb-4">
+                                    <span className="text-2xl font-bold mt-2">₹</span>
+                                    <span className="text-6xl font-black font-serif">{plan.price}</span>
+                                </div>
+                                <p className="text-gray-400 text-sm italic h-10 line-clamp-2">
+                                    "{plan.description}"
+                                </p>
+                            </div>
+                            
+                            <div className="flex-1 bg-gray-50 rounded-3xl p-6 mb-8 border border-gray-100">
+                                <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Plan Features</h4>
+                                <ul className="space-y-4">
+                                    {plan.features.split(',').map((feature, i) => (
+                                        <li key={i} className="flex items-start gap-3 text-sm text-gray-700 font-medium">
+                                            <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                                            <span className="leading-relaxed">{feature.trim()}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <button 
+                                onClick={() => !isCurrent && handlePurchase(plan.id, plan.title)}
+                                disabled={isCurrent}
+                                className={`w-full py-4 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2
+                                    ${isCurrent 
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                        : 'bg-emerald-700 text-white hover:bg-emerald-800 shadow-lg shadow-emerald-100 active:scale-95'
+                                    }`}
+                            >
+                                {isCurrent ? (
+                                    'Currently Active'
+                                ) : plan.price === 0 ? (
+                                    <>Start Free <Zap size={16} /></>
+                                ) : (
+                                    <>Purchase Plan <CreditCard size={16} /></>
+                                )}
                             </button>
-                        )}
-                    </div>
-                ))}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
