@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import API from '../../services/api';
 import { 
   User, Users, Briefcase, Calendar, ShieldAlert, 
-  Award, LogOut 
+  Award, LogOut, Activity, ChevronRight 
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -84,22 +84,64 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* User Details Area */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl">
-                <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700">
-                        <Award size={32} />
+            {/* 🔹 BOTTOM SECTION: Account Info & Recent Activity 🔹 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                {/* User Details Area */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 h-full">
+                    <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+                        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 flex-shrink-0">
+                            <Award size={32} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-800 font-serif">Account Information</h2>
+                            <p className="text-sm text-gray-500">Your current portal details</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800 font-serif">Account Information</h2>
-                        <p className="text-sm text-gray-500">Your current portal details</p>
+                    
+                    <div className="space-y-4">
+                        <InfoRow label="Full Name" value={userData.name} />
+                        <InfoRow label="Email Address" value={userData.email} />
+                        <InfoRow label="Role Type" value={userData.role.toUpperCase()} />
                     </div>
                 </div>
-                
-                <div className="space-y-4">
-                    <InfoRow label="Full Name" value={userData.name} />
-                    <InfoRow label="Email Address" value={userData.email} />
-                    <InfoRow label="Role Type" value={userData.role.toUpperCase()} />
+
+                {/* 🔹 NEW: Recent Activity Widget 🔹 */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-32 h-32 bg-emerald-50 rounded-full opacity-50 pointer-events-none"></div>
+                    
+                    <div className="flex items-center justify-between mb-6 relative z-10">
+                        <h2 className="text-xl font-bold text-gray-800 font-serif">Recent Updates</h2>
+                        <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                            <Activity size={18} />
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-6 flex-1 relative z-10">
+                        {/* Mock Update 1 */}
+                        <Link to="/news" className="flex gap-4 group cursor-pointer">
+                            <div className="w-2 h-2 mt-2 rounded-full bg-emerald-500 group-hover:scale-150 transition-transform flex-shrink-0"></div>
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-800 group-hover:text-emerald-700 transition-colors">SRM KTR Ranks Top in NIRF</h4>
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">SRM Institute achieves a new milestone in the latest national rankings. Read the full story.</p>
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2 block">2 Hours Ago</span>
+                            </div>
+                        </Link>
+                        
+                        {/* Mock Update 2 */}
+                        <Link to="/events" className="flex gap-4 group cursor-pointer">
+                            <div className="w-2 h-2 mt-2 rounded-full bg-amber-500 group-hover:scale-150 transition-transform flex-shrink-0"></div>
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-800 group-hover:text-amber-700 transition-colors">Alumni Homecoming 2026</h4>
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">Registrations are now open for the grand reunion at the KTR campus. Book early!</p>
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2 block">1 Day Ago</span>
+                            </div>
+                        </Link>
+                    </div>
+
+                    <Link to="/news" className="mt-6 w-full py-3 bg-gray-50 text-emerald-700 font-bold rounded-xl text-xs uppercase tracking-widest hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2 relative z-10">
+                        View All News <ChevronRight size={16} />
+                    </Link>
                 </div>
             </div>
 
