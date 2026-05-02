@@ -2,9 +2,54 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
 import { 
-  User, GraduationCap, Briefcase, MapPin, 
-  Globe, Camera, Save, X, Mail 
+    User, GraduationCap, Briefcase, MapPin, 
+    Globe, Camera, Save, X, Mail 
 } from 'lucide-react';
+
+// ─── Static Data Constants ───────────────────────────────────────────────────
+
+const PASSING_YEARS = Array.from({ length: 2077 - 1985 + 1 }, (_, i) => String(1985 + i));
+
+const INDIAN_STATES = [
+    'Andaman and Nicobar Islands',
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chandigarh',
+    'Chhattisgarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jammu and Kashmir',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Ladakh',
+    'Lakshadweep',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Puducherry',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const EditProfile = () => {
     const navigate = useNavigate();
@@ -19,11 +64,22 @@ const EditProfile = () => {
         profile_pic: ''
     });
 
+    // 🔹 Admin-controlled dropdown data (departments, batches only — years/states/cities are now local)
+    const [masterData, setMasterData] = useState({
+        departments: [],
+        batches: []
+    });
+
+    // 🔹 State → City cascade
+    const [cities, setCities] = useState([]);
+    const [citiesLoading, setCitiesLoading] = useState(false);
+
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Fetch User Profile
         const fetchExistingProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -35,9 +91,9 @@ const EditProfile = () => {
                     if (data.dob) data.dob = data.dob.split('T')[0];
                     const mappedData = {
                         ...data,
-                        batch: data.batch?.name || '',
-                        department: data.department?.name || '',
-                        passing_year: data.passingYear?.name || ''
+                        batch: data.batch?.name || data.batch || '',
+                        department: data.department?.name || data.department || '',
+                        passing_year: data.passingYear?.name || data.passing_year || ''
                     };
                     const sanitizedData = Object.fromEntries(
                         Object.entries(mappedData).map(([key, value]) => [key, value === null ? '' : value])
@@ -47,16 +103,70 @@ const EditProfile = () => {
                         setImagePreview(`http://localhost:5000${sanitizedData.profile_pic}`);
                     }
                 }
-                setLoading(false);
             } catch (err) {
-                setLoading(false); 
+                console.error("Error fetching profile", err);
             }
         };
-        fetchExistingProfile();
+
+        // 🔹 Fetch Admin Master Data for Dropdowns (departments & batches only)
+        const fetchMasterData = async () => {
+            try {
+                const [deptRes, batchRes] = await Promise.all([
+                    API.get('/master-data/departments').catch(() => ({ data: [] })),
+                    API.get('/master-data/batches').catch(() => ({ data: [] }))
+                ]);
+
+                setMasterData({
+                    departments: deptRes.data || [],
+                    batches: batchRes.data || [],
+                });
+            } catch (err) {
+                console.error("Error fetching master data", err);
+            }
+        };
+
+        const loadAllData = async () => {
+            await Promise.all([fetchExistingProfile(), fetchMasterData()]);
+            setLoading(false);
+        };
+
+        loadAllData();
     }, []);
 
+    // 🔹 Fetch cities from CountriesNow API whenever the selected state changes
+    useEffect(() => {
+        if (!formData.state) {
+            setCities([]);
+            return;
+        }
+        const fetchCities = async () => {
+            setCitiesLoading(true);
+            try {
+                const res = await fetch('https://countriesnow.space/api/v0.1/countries/state/cities', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ country: 'India', state: formData.state }),
+                });
+                const json = await res.json();
+                setCities(json.data || []);
+            } catch (err) {
+                console.error('Error fetching cities', err);
+                setCities([]);
+            } finally {
+                setCitiesLoading(false);
+            }
+        };
+        fetchCities();
+    }, [formData.state]);
+
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        // Reset city whenever the user picks a different state
+        if (name === 'state') {
+            setFormData(prev => ({ ...prev, state: value, city: '' }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleImageChange = (e) => {
@@ -109,6 +219,9 @@ const EditProfile = () => {
             Loading Profile Data...
         </div>
     );
+
+    // 🔹 Fallback for admin-managed dropdowns only
+    const fallbackDepts = ['Computer Science', 'Mechanical Engineering', 'Information Technology', 'Biotechnology'];
 
     return (
         <div className="p-8 max-w-5xl mx-auto font-sans">
@@ -171,10 +284,29 @@ const EditProfile = () => {
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                         <SectionHeader icon={<GraduationCap size={20}/>} title="Academic Details" />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <InputField label="Batch" name="batch" placeholder="2022-2026" value={formData.batch} onChange={handleChange} />
-                            <InputField label="Passing Year" name="passing_year" placeholder="2026" value={formData.passing_year} onChange={handleChange} />
+                            {/* Converted to SelectFields */}
+                            <SelectField 
+                                label="Batch" 
+                                name="batch" 
+                                value={formData.batch} 
+                                onChange={handleChange} 
+                                options={masterData.batches.length > 0 ? masterData.batches : ['2022-2026', '2021-2025', '2020-2024']} 
+                            />
+                            <SelectField 
+                                label="Passing Year" 
+                                name="passing_year" 
+                                value={formData.passing_year} 
+                                onChange={handleChange} 
+                                options={PASSING_YEARS} 
+                            />
                             <div className="md:col-span-2">
-                                <InputField label="Department" name="department" placeholder="e.g. Computer Science" value={formData.department} onChange={handleChange} />
+                                <SelectField 
+                                    label="Department" 
+                                    name="department" 
+                                    value={formData.department} 
+                                    onChange={handleChange} 
+                                    options={masterData.departments.length > 0 ? masterData.departments : fallbackDepts} 
+                                />
                             </div>
                         </div>
                     </div>
@@ -208,12 +340,37 @@ const EditProfile = () => {
                         <SectionHeader icon={<MapPin size={20}/>} title="Location Details" />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="md:col-span-2">
-                                <InputField label="City" name="city" value={formData.city} onChange={handleChange} />
+                                <SelectField 
+                                    label="State" 
+                                    name="state" 
+                                    value={formData.state} 
+                                    onChange={handleChange} 
+                                    options={INDIAN_STATES} 
+                                />
                             </div>
                             <InputField label="ZIP" name="zip" value={formData.zip} onChange={handleChange} />
-                            <div className="md:col-span-3">
-                                <InputField label="State" name="state" value={formData.state} onChange={handleChange} />
-                            </div>
+
+                            {/* City — only rendered once a state is chosen */}
+                            {formData.state && (
+                                <div className="md:col-span-3">
+                                    {citiesLoading ? (
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">City</label>
+                                            <div className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 font-medium animate-pulse">
+                                                Loading cities…
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <SelectField 
+                                            label="City" 
+                                            name="city" 
+                                            value={formData.city} 
+                                            onChange={handleChange} 
+                                            options={cities} 
+                                        />
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -269,6 +426,7 @@ const InputField = ({ label, name, type = "text", value, onChange, placeholder, 
     </div>
 );
 
+// 🔹 Updated SelectField to handle both string arrays AND object arrays (from your backend Database)
 const SelectField = ({ label, name, value, onChange, options }) => (
     <div className="flex flex-col gap-1.5 w-full">
         <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-wider">{label}</label>
@@ -276,10 +434,16 @@ const SelectField = ({ label, name, value, onChange, options }) => (
             name={name}
             value={value}
             onChange={onChange}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:bg-white transition-all outline-none text-gray-800 font-medium appearance-none"
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:bg-white transition-all outline-none text-gray-800 font-medium appearance-none cursor-pointer"
         >
             <option value="">Select {label}</option>
-            {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            {options.map(opt => {
+                // If the backend returns an object like { id: 1, name: 'Computer Science' }
+                const optValue = typeof opt === 'object' ? (opt.name || opt.year || opt.id) : opt;
+                const optLabel = typeof opt === 'object' ? (opt.name || opt.year || opt.id) : opt;
+                
+                return <option key={optValue} value={optValue}>{optLabel}</option>
+            })}
         </select>
     </div>
 );
